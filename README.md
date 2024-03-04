@@ -1,12 +1,8 @@
-# BSV TEMPLATE
-
-BSV BLOCKCHAIN | Template repository for open-source projects
-
-Update this README with information about the project.
+# BSV Paymail
 
 ## Table of Contents
 
-- [BSV TEMPLATE](#bsv-template)
+- [BSV Paymail](#bsv-paymail)
   - [Table of Contents](#table-of-contents)
   - [Objective](#objective)
   - [Getting Started](#getting-started)
