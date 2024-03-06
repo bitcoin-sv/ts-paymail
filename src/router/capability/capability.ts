@@ -1,16 +1,21 @@
 import { Request, Response, RequestHandler } from 'express';
 
-class Capability<DomainResponse> {
-    private endpoint: string;
-    private domainLogicHandler: RequestHandler;
-    private code: string;
-    private validateSignature: boolean;
 
-    constructor(code: string, endpoint: string, domainLogicHandler: RequestHandler, validateSignature?: boolean) {
+class Capability {
+    constructor(
+        private code: string, 
+        private endpoint: string,
+        private method: 'GET' | 'POST',
+        private domainLogicHandler: RequestHandler,
+        private validateSignature?: boolean,
+        protected bodyValidator?: (body: any) => any
+    ) 
+        {
         this.endpoint = this.validateEndpoint(endpoint);
         this.domainLogicHandler = domainLogicHandler;
         this.code = this.validateCode(code);
         this.validateSignature = validateSignature;
+        this.method = method;
     }
 
     private validateCode(code: string): string {
@@ -37,18 +42,24 @@ class Capability<DomainResponse> {
         if (this.validateSignature) {
             // validate signature
         }
-        const response = await this.domainLogicHandler(name, domain);
-        const serializedResponse = this.serializeResponse(response as DomainResponse);
+        if (this.bodyValidator) {
+            const body = this.bodyValidator(req.body);
+            if (body instanceof Error) {
+                return res.status(400).send(body.message);
+            }
+        }
+        const response = await this.domainLogicHandler(name, domain, req.body);
+        const serializedResponse = this.serializeResponse(response);
         return this.sendSuccessResponse(res, serializedResponse);
     }
     
-    protected serializeResponse(response: DomainResponse): string {
+    protected serializeResponse(response): string {
         return JSON.stringify(response);
     }
 
-    protected sendSuccessResponse(res: Response, content: string): string {
-        return res.status(200).send(content);
-    }
+    protected sendSuccessResponse(res: Response, content: string): Response {
+        return res.type('application/json').status(200).send(content);
+      }      
 
     public getHandler(): RequestHandler {
         return this.defaultHandler.bind(this);
@@ -62,6 +73,9 @@ class Capability<DomainResponse> {
         return this.endpoint;
     }
 
+    public getMethod(): 'GET' | 'POST' {
+        return this.method;
+    }
 }
 
 export default Capability;

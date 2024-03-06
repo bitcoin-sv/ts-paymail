@@ -1,6 +1,6 @@
 import express, { Router, ErrorRequestHandler } from 'express';
 import bodyParser from 'body-parser';
-import Capability from './capability.js';
+import Capability from './capability/capability.js';
 
 class PaymailRouter {
     private router: Router;
@@ -14,7 +14,14 @@ class PaymailRouter {
         this.capabilities = capabilities;
 
         capabilities.forEach(capability => {
-            this.router.get(capability.getEndpoint(), capability.getHandler());
+            const method = capability.getMethod();
+            if (method === 'GET') {
+                this.router.get(capability.getEndpoint(), capability.getHandler());
+            } else if (method === 'POST') {
+                this.router.post(capability.getEndpoint(), capability.getHandler());
+            } else {
+                throw new Error('Unsupported method: ' + method);
+            }
         });
         this.addWellKnownRouter();
         if (errorHandler) {

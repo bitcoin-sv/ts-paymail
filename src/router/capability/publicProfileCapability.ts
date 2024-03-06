@@ -9,9 +9,9 @@ interface PublicProfileResponse {
     name: string;
 }
 
-export class PublicProfileCapability extends Capability<PublicProfileResponse>  {
+export class PublicProfileCapability extends Capability  {
     constructor(domainLogicHandler: RequestHandler, endpoint = '/public-profile/:paymail') {
-        super(code, endpoint, domainLogicHandler, false);
+        super(code, endpoint, 'GET', domainLogicHandler, false);
     }
     
     protected serializeResponse(domainLogicResponse: PublicProfileResponse): string {
