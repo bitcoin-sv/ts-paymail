@@ -1,19 +1,17 @@
 import { Request, Response, RequestHandler } from 'express';
 import CapabilityDefinition from 'src/capabilityDefinition/capabilityDefinition.js';
 
-class Route {
+class PaymailRoute {
     constructor(
         private capability: CapabilityDefinition, 
         private endpoint: string,
         private method: 'GET' | 'POST',
         private domainLogicHandler: RequestHandler,
-        private validateSignature?: boolean,
         protected bodyValidator?: (body: any) => any
     ) 
         {
         this.endpoint = this.validateEndpoint(endpoint);
         this.domainLogicHandler = domainLogicHandler;
-        this.validateSignature = validateSignature;
         this.method = method;
     }
 
@@ -32,9 +30,6 @@ class Route {
 
     protected async defaultHandler(req: Request, res: Response): Promise<any> {
         const { name, domain } = this.getNameAndDomainFromRequest(req);
-        if (this.validateSignature) {
-            // validate signature
-        }
         if (this.bodyValidator) {
             const body = this.bodyValidator(req.body);
             if (body instanceof Error) {
@@ -71,5 +66,4 @@ class Route {
     }
 }
 
-export default Route
-;
+export default PaymailRoute;

@@ -23,7 +23,7 @@ export default class CapabilityDefinition {
         if(!title) throw new Error('CapabilityDefinition requires a title');
         this.code = code;
         this.title = title;
-        this.authors = authors;
+        this.authors = authors || [];
         this.version = version;
         this.supersedes = supersedes;
     }
@@ -33,7 +33,7 @@ export default class CapabilityDefinition {
     }
 
     private bfrc() {
-        const stringToHash = [this.title.trim() + this.authors.join(', ').trim() + (this.version.toString() || '')].join('').trim();
+        const stringToHash = [this.title.trim() + this.authors.join(', ').trim() + (this.version?.toString() || '')].join('').trim();
         const bufferHash = new Hash.SHA256().update(new Hash.SHA256().update(stringToHash).digest()).digest();
         const hash = bufferHash.reverse();
         return Buffer.from(hash).toString('hex').substring(0, 12);

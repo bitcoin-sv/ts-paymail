@@ -1,8 +1,9 @@
 
+import PaymailRoute from './route.js';
 import { RequestHandler } from 'express';
 import { P2pPaymentDestinationCapability } from '../../capabilityDefinition/capabilityDefinition.js';
 import joi from 'joi';
-import Route from './route.js';
+
 
 interface P2pDestination {
     script: string;
@@ -14,7 +15,7 @@ interface P2pDestination {
     reference: string;
   }
   
-export class P2pPaymentDestinationRoute extends Route  {
+export class P2pPaymentDestinationRoute extends PaymailRoute  {
     constructor(domainLogicHandler: RequestHandler, endpoint = '/p2p-payment-destination/:paymail') {
         super(P2pPaymentDestinationCapability, endpoint, 'POST', domainLogicHandler);
         this.bodyValidator = this.getBodyValidator();
