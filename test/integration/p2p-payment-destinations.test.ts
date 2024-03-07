@@ -1,16 +1,16 @@
 import request from 'supertest';
 import express from 'express';
 import PaymailRouter from '../../dist/cjs/src/router/router.js';
-import { P2pDestinationsCapability } from '../../dist/cjs/src/router/capability/p2pDestinationsCapability.js';
+import { P2pPaymentDestinationRoute } from '../../dist/cjs/src/router/routes/p2pPaymentDestinationRoute.js';
 
-describe('#Paymail Server - P2P Destinations Capability', () => {
+describe('#Paymail Server - P2P Payment Destinations', () => {
   let app;
 
   beforeAll(() => {
     app = express();
     const baseUrl = 'http://localhost:3000';
-    const capabilities = [
-      new P2pDestinationsCapability((name, domain, body) => {
+    const routes = [
+      new P2pPaymentDestinationRoute((name, domain, body) => {
         return  {
           "outputs": [
             {
@@ -22,7 +22,7 @@ describe('#Paymail Server - P2P Destinations Capability', () => {
         };
       }),
     ];
-    const paymailRouter = new PaymailRouter(baseUrl, capabilities);
+    const paymailRouter = new PaymailRouter(baseUrl, routes);
     app.use(paymailRouter.getRouter());
   });
 

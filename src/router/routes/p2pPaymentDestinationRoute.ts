@@ -1,9 +1,8 @@
-import Capability from './capability.js';
-import { RequestHandler } from 'express';
-import joi from 'joi';
 
-// TODO hash the code using the bfrc spec
-const code = '2a40af698840';
+import { RequestHandler } from 'express';
+import { P2pPaymentDestinationCapability } from '../../capabilityDefinition/capabilityDefinition.js';
+import joi from 'joi';
+import Route from './route.js';
 
 interface P2pDestination {
     script: string;
@@ -15,9 +14,9 @@ interface P2pDestination {
     reference: string;
   }
   
-export class P2pDestinationsCapability extends Capability  {
+export class P2pPaymentDestinationRoute extends Route  {
     constructor(domainLogicHandler: RequestHandler, endpoint = '/p2p-payment-destination/:paymail') {
-        super(code, endpoint, 'POST', domainLogicHandler);
+        super(P2pPaymentDestinationCapability, endpoint, 'POST', domainLogicHandler);
         this.bodyValidator = this.getBodyValidator();
     }
 

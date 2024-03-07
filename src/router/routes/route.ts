@@ -1,9 +1,9 @@
 import { Request, Response, RequestHandler } from 'express';
+import CapabilityDefinition from 'src/capabilityDefinition/capabilityDefinition.js';
 
-
-class Capability {
+class Route {
     constructor(
-        private code: string, 
+        private capability: CapabilityDefinition, 
         private endpoint: string,
         private method: 'GET' | 'POST',
         private domainLogicHandler: RequestHandler,
@@ -13,17 +13,10 @@ class Capability {
         {
         this.endpoint = this.validateEndpoint(endpoint);
         this.domainLogicHandler = domainLogicHandler;
-        this.code = this.validateCode(code);
         this.validateSignature = validateSignature;
         this.method = method;
     }
 
-    private validateCode(code: string): string {
-        if (!code || typeof code !== 'string') {
-            throw new Error('Invalid code: Code must be a non-empty string.');
-        }
-        return code;
-    }
 
     private validateEndpoint(endpoint: string): string {
         if (!endpoint || typeof endpoint !== 'string' || !endpoint.startsWith('/')) {
@@ -66,7 +59,7 @@ class Capability {
     }
 
     public getCode(): string {
-        return this.code;
+        return this.capability.getCode();
     };
     
     public getEndpoint(): string {
@@ -78,4 +71,5 @@ class Capability {
     }
 }
 
-export default Capability;
+export default Route
+;

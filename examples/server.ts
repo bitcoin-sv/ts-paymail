@@ -1,13 +1,12 @@
 import express from 'express';
 import PaymailRouter from '../src/router/router.js';
-import Capability from '../src/router/capability/capability.js';
-import { PublicProfileCapability } from '../src/router/capability/publicProfileCapability.js';
-
+import Capability from '../src/router/routes/route.js';
+import { PublicProfileRoute } from '../src/router/routes/publicProfileRoute.js';
 const app = express();
 
 const baseUrl = 'http://localhost:3000';
 const capabilities = [
-    new PublicProfileCapability((name, domain) => {
+    new PublicProfileRoute((name, domain) => {
         return { name, domain, avatarUrl: `https://avatar.com/${name}@${domain}` };
     }),
 ];

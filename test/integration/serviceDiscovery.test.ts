@@ -1,7 +1,7 @@
 import request from 'supertest';
 import express from 'express';
 import PaymailRouter from '../../dist/cjs/src/router/router.js';
-import { PublicProfileCapability } from '../../dist/cjs/src/router/capability/publicProfileCapability.js';
+import { PublicProfileRoute } from '../../dist/cjs/src/router/routes/publicProfileRoute.js';
 
 describe('#Paymail Server - Capability discovery', () => {
   let app;
@@ -10,7 +10,7 @@ describe('#Paymail Server - Capability discovery', () => {
     app = express();
     const baseUrl = 'http://localhost:3000';
     const capabilities = [
-      new PublicProfileCapability((name, domain) => {
+      new PublicProfileRoute((name, domain) => {
         return { name, domain, avatarUrl: `https://avatar.com/${name}@${domain}` };
       }),
     ];

@@ -1,17 +1,15 @@
-import Capability from './capability.js';
+import Capability from './route.js';
 import { RequestHandler } from 'express';
-
-// TODO hash the code using the bfrc spec
-const code = 'f12f968c92d6';
+import { PublicProfileCapability } from '../../capabilityDefinition/capabilityDefinition.js';
 
 interface PublicProfileResponse {
     avatarUrl: string;
     name: string;
 }
 
-export class PublicProfileCapability extends Capability  {
+export class PublicProfileRoute extends Capability  {
     constructor(domainLogicHandler: RequestHandler, endpoint = '/public-profile/:paymail') {
-        super(code, endpoint, 'GET', domainLogicHandler, false);
+        super(PublicProfileCapability, endpoint, 'GET', domainLogicHandler, false);
     }
     
     protected serializeResponse(domainLogicResponse: PublicProfileResponse): string {

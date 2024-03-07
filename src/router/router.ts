@@ -1,24 +1,24 @@
 import express, { Router, ErrorRequestHandler } from 'express';
 import bodyParser from 'body-parser';
-import Capability from './capability/capability.js';
+import Route from './routes/route.js';
 
 class PaymailRouter {
     private router: Router;
     public baseUrl: string;
-    public capabilities: Capability[];
+    public routes: Route[];
 
-    constructor(baseUrl: string, capabilities: Capability[], errorHandler?: ErrorRequestHandler) {
+    constructor(baseUrl: string, routes: Route[], errorHandler?: ErrorRequestHandler) {
         this.baseUrl = baseUrl;
         this.router = express.Router();
         this.router.use(bodyParser.json({  type: 'application/json' }))
-        this.capabilities = capabilities;
+        this.routes = routes;
 
-        capabilities.forEach(capability => {
-            const method = capability.getMethod();
+        routes.forEach(route => {
+            const method = route.getMethod();
             if (method === 'GET') {
-                this.router.get(capability.getEndpoint(), capability.getHandler());
+                this.router.get(route.getEndpoint(), route.getHandler());
             } else if (method === 'POST') {
-                this.router.post(capability.getEndpoint(), capability.getHandler());
+                this.router.post(route.getEndpoint(), route.getHandler());
             } else {
                 throw new Error('Unsupported method: ' + method);
             }
@@ -34,8 +34,8 @@ class PaymailRouter {
             res.type('application/json');
             res.send({
                 bsvalias: '1.0',
-                capabilities: this.capabilities.reduce((map, capability) => {
-                    map[capability.getCode()] = this.joinUrl(this.baseUrl, capability.getEndpoint());
+                capabilities: this.routes.reduce((map, route) => {
+                    map[route.getCode()] = this.joinUrl(this.baseUrl, route.getEndpoint());
                     return map;
                 }, {})
             });
