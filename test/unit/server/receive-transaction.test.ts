@@ -1,7 +1,7 @@
 import request from 'supertest';
 import express from 'express';
-import PaymailRouter from '../../dist/cjs/src/router/router.js';
-import { ReceiveTransactionRoute } from '../../dist/cjs/src/router/routes/receiveTransaction.js';
+import PaymailRouter from '../../../dist/cjs/src/router/router.js';
+import { ReceiveTransactionRoute } from '../../../dist/cjs/src/router/routes/receiveTransaction.js';
 
 describe('#Paymail Server - P2P Receive Transaction', () => {
   let app;

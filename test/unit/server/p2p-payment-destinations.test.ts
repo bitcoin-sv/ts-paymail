@@ -1,10 +1,12 @@
 import request from 'supertest';
 import express from 'express';
-import PaymailRouter from '../../dist/cjs/src/router/router.js';
-import { P2pPaymentDestinationRoute } from '../../dist/cjs/src/router/routes/p2pPaymentDestinationRoute.js';
+import PaymailRouter from '../../../dist/cjs/src/router/router.js';
+import { P2pPaymentDestinationRoute } from '../../../dist/cjs/src/router/routes/p2pPaymentDestinationRoute.js';
+import PaymailClient from '../../../dist/cjs/src/client/paymailClient.js';
 
 describe('#Paymail Server - P2P Payment Destinations', () => {
   let app;
+  let client: PaymailClient;
 
   beforeAll(() => {
     app = express();

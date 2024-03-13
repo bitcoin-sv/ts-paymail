@@ -1,7 +1,7 @@
 import request from 'supertest';
 import express from 'express';
-import PaymailRouter from '../../dist/cjs/src/router/router.js';
-import { PublicKeyInfrastructureRoute } from '../../dist/cjs/src/router/routes/pki.js';
+import PaymailRouter from '../../../dist/cjs/src/router/router.js';
+import { PublicKeyInfrastructureRoute } from '../../../dist/cjs/src/router/routes/pki.js';
 import { PrivateKey } from '@bsv/sdk';
 
 
