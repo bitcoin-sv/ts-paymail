@@ -21,8 +21,6 @@ export default class PaymailClient {
         } else {
           ({ domain, port } = await this._resolver.queryBsvaliasDomain(aDomain));
         }
-        console.log({ domain, port, protocol })
-        console.log(`${protocol}${domain}:${port}/.well-known/bsvalias`)
         const response = await fetch(`${protocol}${domain}:${port}/.well-known/bsvalias`);
         if (!response.ok) {
           throw new Error(`Failed to fetch well-known for "${aDomain}"`);

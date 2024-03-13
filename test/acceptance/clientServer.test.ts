@@ -29,7 +29,6 @@ describe('#Paymail Server - End to end test with PaymailClient and Server', () =
 
   it('should get capabilities', async () => {
     const response = await client.getDomainCapabilities('localhost');
-    console.log(response);
     expect(response.bsvalias).toBe('1.0');
     expect(response.capabilities).toHaveProperty('f12f968c92d6');
     expect(response.capabilities['6745385c3fc0']).toEqual(true);
