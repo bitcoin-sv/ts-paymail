@@ -1,4 +1,3 @@
-import request from 'supertest';
 import express from 'express';
 import PaymailRouter from '../../dist/cjs/src/router/router.js';
 import { PublicProfileRoute } from '../../dist/cjs/src/router/routes/publicProfileRoute.js';
