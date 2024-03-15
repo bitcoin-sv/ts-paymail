@@ -1,14 +1,26 @@
 import AbstractResolver from "./resolver/abstractResolver.js";
 import DNSResolver, { DNSResolverOptions } from "./resolver/dnsResolver.js";
+import HttpClient from "./httpClient.js";
+import CapabilityDefinition from "../capabilityDefinition/capabilityDefinition.js";
+
+import PublicProfileCapability from "../capabilityDefinition/publicProfileCapability.js";
+import PublicKeyInfrastructureCapability from "../capabilityDefinition/pkiCapability.js";
+import P2pPaymentDestinationCapability from "../capabilityDefinition/p2pPaymentDestinationCapability.js";
+import ReceiveTransactionCapability from "../capabilityDefinition/p2pReceiveTransactionCapability.js";
+import VerifyPublicKeyOwnerCapability from "../capabilityDefinition/verifyPublicKeyOwnerCapability.js";
+
+
 
 export default class PaymailClient {
     private _domainCapabilityCache: Map<string, Map<string, any>>;
     private _resolver: AbstractResolver;
     private _localHostPort: number;
+    private httpClient: HttpClient;
 
-    constructor(dnsOptions?: DNSResolverOptions, localhostPort?: number) {
+    constructor(dnsOptions?: DNSResolverOptions, localhostPort?: number,) {
+        this.httpClient = new HttpClient(fetch);
         this._domainCapabilityCache = new Map();
-        this._resolver =  new DNSResolver(dnsOptions);
+        this._resolver =  new DNSResolver(dnsOptions, this.httpClient);
         this._localHostPort = localhostPort || 3000;
     }
 
@@ -28,8 +40,12 @@ export default class PaymailClient {
       if (!response.ok) {
         throw new Error(`Failed to fetch well-known for "${aDomain}" with URL: ${url}`);
       }
+
+      const json = await response.json();
+      if (json.bsvalias !== '1.0') throw new Error(`Domain "${aDomain}" is not on bsvalias version 1.0`); 
+      if (!json.capabilities) throw new Error(`Domain "${aDomain}" invalid response does not have any capabilities`);
     
-      return response.json();
+      return json.capabilities;
     }
     
     
@@ -50,5 +66,58 @@ export default class PaymailClient {
         if (!capabilities[aCapability]) {
           throw new Error(`Domain "${aDomain}" does not support capability "${aCapability}"`);
         }
+        return capabilities[aCapability];
     };
+
+    public request = async (aDomain: string, capability: CapabilityDefinition, body?: any) => {
+      const [name, domain] = aDomain.split('@');
+      const url = await this.ensureCapabilityFor(domain, capability.getCode());
+      const requestUrl = url.replace('{alias}', name).replace('{domain.tld}', domain);
+      const response = await this.httpClient.request(requestUrl, {
+        method: capability.getMethod(),
+        body,
+      });
+      const responseBody = await response.json();
+      return capability.validateBody(responseBody);
+    };
+
+    public getPublicProfile = async (paymail) => {
+      return this.request(paymail, PublicProfileCapability);
+    };
+
+    public getPki = async (paymail) => {
+      return this.request(paymail, PublicKeyInfrastructureCapability);
+    }
+
+    public getP2pPaymentDestination = async (paymail, satoshis: number) => {
+      const response = await this.request(paymail, P2pPaymentDestinationCapability, {
+        satoshis,
+      });
+      if (satoshis !== response.outputs.reduce((acc, output) => acc + output.satoshis, 0)) {
+        throw new Error('The server did not return the expected amount of satoshis');
+      }
+      return response;
+    }
+
+    public sendTransactionP2P = async (paymail, txHex: string, reference: string, metadata: {
+      sender: string,
+      pubkey: string,
+      signature: string,
+      note: string
+    }) => {
+      return this.request(paymail, ReceiveTransactionCapability, {
+        txHex,
+        reference,
+        metadata,
+      });
+    }
+
+    public verifyPublicKey = async (paymail, pubkey) => {
+      const [name, domain] = paymail.split('@');
+      const url = await this.ensureCapabilityFor(domain, VerifyPublicKeyOwnerCapability.getCode());
+      const requestUrl = url.replace('{alias}', name).replace('{domain.tld}', domain).replace('{pubkey}', pubkey);
+      const response = await this.httpClient.request(requestUrl);
+      const responseBody = await response.json();
+      return VerifyPublicKeyOwnerCapability.validateBody(responseBody);
+    }
 }

@@ -1,6 +1,6 @@
 import PaymailRoute from './route.js';
 import { RequestHandler } from 'express';
-import { ReceiveTransactionCapability } from '../../capabilityDefinition/capabilityDefinition.js';
+import P2pReceiveTransactionCapability from '../../capabilityDefinition/p2pReceiveTransactionCapability.js';
 
 
 interface ReceiveTransactionResponse {
@@ -9,7 +9,7 @@ interface ReceiveTransactionResponse {
 
 export class ReceiveTransactionRoute extends PaymailRoute  {
     constructor(domainLogicHandler: RequestHandler, endpoint = '/receive-transaction/:paymail') {
-        super(ReceiveTransactionCapability, endpoint, 'POST', domainLogicHandler);
+        super(P2pReceiveTransactionCapability, endpoint, domainLogicHandler);
     }
     ReceiveTransactionResponse
     protected serializeResponse(domainLogicResponse: ReceiveTransactionResponse): string {

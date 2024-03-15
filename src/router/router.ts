@@ -1,7 +1,7 @@
 import express, { Router, ErrorRequestHandler } from 'express';
 import bodyParser from 'body-parser';
 import Route from './routes/route.js';
-import { RequestSenderValidationCapability } from  '../capabilityDefinition/capabilityDefinition.js';
+import RequestSenderValidationCapability from '../capabilityDefinition/requestSenderValidationCapability.js';
 
 class PaymailRouter {
     private router: Router;

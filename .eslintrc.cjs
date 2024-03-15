@@ -5,25 +5,34 @@ module.exports = {
     },
     "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/recommended",
     ],
-    "overrides": [
+    "ignorePatterns": ["**/*.d.ts"],
+    overrides: [
         {
-            "env": {
-                "node": true
-            },
-            "files": [
-                ".eslintrc.{js,cjs}"
-            ],
-            "parserOptions": {
-                "sourceType": "script"
+            files: ['src/**/*.ts'],
+            parserOptions: {
+                project: ['./tsconfig.esm.json', './tsconfig.cjs.json']
+            }
+        },
+        {
+            files: ['test/**/*.ts'],
+            parserOptions: {
+                project: ['./tsconfig.test.json']
+            }
+        },
+        {
+            files: ['examples/**/*.ts'],
+            parserOptions: {
+                project: ['./tsconfig.examples.json']
             }
         }
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "latest",
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": "./tsconfig.json"
     },
     "plugins": [
         "@typescript-eslint"

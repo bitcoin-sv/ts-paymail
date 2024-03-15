@@ -1,6 +1,5 @@
 import express from 'express';
 import PaymailRouter from '../src/router/router.js';
-import Capability from '../src/router/routes/route.js';
 import { PublicProfileRoute } from '../src/router/routes/publicProfileRoute.js';
 const app = express();
 

@@ -9,8 +9,11 @@ describe('#PaymailClient - Capability Discovery', () => {
 
     it('should get capabilities for paymail', async () => {
         const capabilities = await paymailClient.getDomainCapabilities('handcash.io');
-        expect(capabilities).toHaveProperty('bsvalias');
-        expect(capabilities.capabilities).toHaveProperty('pki');
+        expect(capabilities).toHaveProperty('pki');
     });
 
+    it('should get capabilities for paymail', async () => {
+        const capabilities = await paymailClient.getDomainCapabilities('tkz.id');
+        expect(capabilities).toHaveProperty('pki');
+    });
 });

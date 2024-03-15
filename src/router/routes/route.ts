@@ -5,14 +5,12 @@ class PaymailRoute {
     constructor(
         private capability: CapabilityDefinition, 
         private endpoint: string,
-        private method: 'GET' | 'POST',
         private domainLogicHandler: RequestHandler,
         protected bodyValidator?: (body: any) => any
     ) 
         {
         this.endpoint = this.validateEndpoint(endpoint);
         this.domainLogicHandler = domainLogicHandler;
-        this.method = method;
     }
 
 
@@ -30,6 +28,7 @@ class PaymailRoute {
 
     protected async defaultHandler(req: Request, res: Response): Promise<any> {
         const { name, domain } = this.getNameAndDomainFromRequest(req);
+        
         if (this.bodyValidator) {
             const body = this.bodyValidator(req.body);
             if (body instanceof Error) {
@@ -55,14 +54,14 @@ class PaymailRoute {
 
     public getCode(): string {
         return this.capability.getCode();
-    };
+    }
     
     public getEndpoint(): string {
         return this.endpoint;
     }
 
     public getMethod(): 'GET' | 'POST' {
-        return this.method;
+        return this.capability.getMethod();
     }
 }
 

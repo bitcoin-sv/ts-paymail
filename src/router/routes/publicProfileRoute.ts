@@ -1,6 +1,6 @@
 import PaymailRoute from './route.js';
 import { RequestHandler } from 'express';
-import { PublicProfileCapability } from '../../capabilityDefinition/capabilityDefinition.js';
+import PublicProfileCapability from '../../capabilityDefinition/publicProfileCapability.js';
 
 interface PublicProfileResponse {
     avatarUrl: string;
@@ -9,7 +9,7 @@ interface PublicProfileResponse {
 
 export class PublicProfileRoute extends PaymailRoute  {
     constructor(domainLogicHandler: RequestHandler, endpoint = '/public-profile/:paymail') {
-        super(PublicProfileCapability, endpoint, 'GET', domainLogicHandler);
+        super(PublicProfileCapability, endpoint, domainLogicHandler);
     }
     
     protected serializeResponse(domainLogicResponse: PublicProfileResponse): string {

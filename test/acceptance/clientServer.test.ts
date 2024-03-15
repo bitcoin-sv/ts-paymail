@@ -27,9 +27,8 @@ describe('#Paymail Server - End to end test with PaymailClient and Server', () =
   });
 
   it('should get capabilities', async () => {
-    const response = await client.getDomainCapabilities('localhost');
-    expect(response.bsvalias).toBe('1.0');
-    expect(response.capabilities).toHaveProperty('f12f968c92d6');
-    expect(response.capabilities['6745385c3fc0']).toEqual(true);
+    const capabilities = await client.getDomainCapabilities('localhost');
+    expect(capabilities).toHaveProperty('f12f968c92d6');
+    expect(capabilities['6745385c3fc0']).toEqual(true);
   });
 });

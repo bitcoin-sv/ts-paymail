@@ -10,27 +10,28 @@ export default class HttpClient {
     this.defaultTimeout = defaultTimeout;
   }
 
-  async get(url: string, options: FetchOptions = {}) {
-    return this.request(url, { ...options, method: 'GET' });
-  }
-
-  async postJson(url: string, body: any, options: FetchOptions = {}) {
-    return this.request(url, {
-      ...options,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      body: JSON.stringify(body),
-    });
-  }
-
-  private async request(url: string, options: FetchOptions): Promise<Response> {
+  async request(
+    url: string, 
+    options: (FetchOptions & { method: 'GET' | 'POST', body?: any }) = {
+      method: 'GET'
+    }
+  ): Promise<Response> {
     const controller = new AbortController();
     const timeout = options.timeout ?? this.defaultTimeout;
     const timeoutId = setTimeout(() => controller.abort(), timeout);
-    const requestOptions = { ...options, signal: controller.signal };
+
+    const requestOptions: FetchOptions = { 
+      ...options, 
+      signal: controller.signal 
+    };
+
+    if (options.method === 'POST' && options.body) {
+      requestOptions.body = JSON.stringify(options.body);
+      requestOptions.headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+    }
 
     try {
       const response = await this.fetch(url, requestOptions);
@@ -44,5 +45,4 @@ export default class HttpClient {
       clearTimeout(timeoutId);
     }
   }
-
 }

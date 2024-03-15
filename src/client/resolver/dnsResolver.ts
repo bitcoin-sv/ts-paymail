@@ -11,11 +11,11 @@ class DNSResolver extends AbstractResolver {
     private httpClient: HttpClient;
     private dns: any;
 
-    constructor(options: DNSResolverOptions = {}) {
+    constructor(options: DNSResolverOptions = {}, httpClient: HttpClient) {
         super();
         const { dns, dohServerBaseUrl = 'https://dns.google.com/resolve' } = options;
         this.dohServiceBaseUrl = dohServerBaseUrl;
-        this.httpClient = new HttpClient(fetch);
+        this.httpClient = httpClient;
         this.dns = dns;
     }
 
@@ -71,7 +71,7 @@ class DNSResolver extends AbstractResolver {
       }
 
         private resolveWithDoh = async (aDomain: string): Promise<any> => {
-          const response = await this.httpClient.get(`${this.dohServiceBaseUrl}?name=${aDomain}&type=SRV&cd=0`);
+          const response = await this.httpClient.request(`${this.dohServiceBaseUrl}?name=${aDomain}&type=SRV&cd=0`);
           const dohResponse = await response.json();
 
           // Record not found assume port 443 and domain is the same as the input per spec

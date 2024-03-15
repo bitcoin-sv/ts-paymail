@@ -1,24 +1,30 @@
 import { Hash } from '@bsv/sdk'; 
 
 export default class CapabilityDefinition {
-    code?: string;
-    title: string;
-    authors?: string[];
-    version?: string;
-    supersedes?: string[];
+    private code?: string;
+    private title: string;
+    private authors?: string[];
+    private version?: string;
+    private supersedes?: string[];
+    private method?: 'GET' | 'POST';
+    private responseBodyValidator?: (body: any) => any;
 
     constructor({
         code,
         title,
         authors,
         version,
-        supersedes
+        supersedes,
+        responseBodyValidator,
+        method,
     }: {
         code?: string;
         title: string;
         authors?: string[];
         version?: string;
         supersedes?: string[];
+        method?: 'GET' | 'POST';
+        responseBodyValidator?: (body: any) => any;
     }) {
         if(!title) throw new Error('CapabilityDefinition requires a title');
         this.code = code;
@@ -26,10 +32,23 @@ export default class CapabilityDefinition {
         this.authors = authors || [];
         this.version = version;
         this.supersedes = supersedes;
+        this.method = method;
+        this.responseBodyValidator = responseBodyValidator;
     }
 
     public getCode(): string {
         return this.code || this.bfrc();
+    }
+
+    public getMethod(): 'GET' | 'POST'{
+        return this.method || 'GET';
+    }
+
+    public validateBody(body: any): any {
+        if (this.responseBodyValidator) {
+            return this.responseBodyValidator(body);
+        }
+        return body;
     }
 
     private bfrc() {
@@ -39,39 +58,3 @@ export default class CapabilityDefinition {
         return Buffer.from(hash).toString('hex').substring(0, 12);
     }
 }
-
-
-const PublicProfileCapability = new CapabilityDefinition({
-    title: 'Public Profile (Name & Avatar)',
-    authors: ['Ryan X. Charles (Money Button)'],
-    version: '1'
-});
-
-const PublicKeyInfrastructureCapability = new CapabilityDefinition({
-    title: 'Public Key Identity',
-    code: 'pki',
-});
-
-const RequestSenderValidationCapability = new CapabilityDefinition({
-    title: 'bsvalias Payment Addressing (Payer Validation)',
-    authors: ['andy (nChain)'],
-});
-
-const VerifyPublicKeyOwnerCapability = new CapabilityDefinition({
-    title: 'bsvalias public key verify (Verify Public Key Owner)',
-});
-
-const ReceiveTransactionCapability = new CapabilityDefinition({
-    title: 'Receive Transaction',
-    authors: ['Miguel Duarte (Money Button)', 'Ryan X. Charles (Money Button)', 'Ivan Mlinaric (Handcash)', 'Rafa (Handcash)'],
-    version: '1.1',
-});
-
-const P2pPaymentDestinationCapability = new CapabilityDefinition({
-    title: 'Get no monitored payment destination (p2p payment destination)',
-    authors: ['Miguel Duarte (Money Button)', 'Ryan X. Charles (Money Button)', 'Ivan Mlinaric (Handcash)', 'Rafa (Handcash)'],
-    version: '1.1',
-});
-
-
-export { PublicProfileCapability, PublicKeyInfrastructureCapability, RequestSenderValidationCapability, VerifyPublicKeyOwnerCapability, ReceiveTransactionCapability, P2pPaymentDestinationCapability};

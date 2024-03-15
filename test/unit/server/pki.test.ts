@@ -7,7 +7,7 @@ import { PrivateKey } from '@bsv/sdk';
 
 describe('#Paymail Server - PKI', () => {
   let app;
-  let userIdentityKey = PrivateKey.fromRandom();
+  const userIdentityKey = PrivateKey.fromRandom();
 
   beforeAll(() => {
     app = express();
