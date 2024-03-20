@@ -1,8 +1,8 @@
 
 # Capability 
-A base definition for any new capability, contains information regarding the bfrc, HTTP Method, validation response body. Paymail Routes and Paymail Client take a base definition to extend the capabilities
+A base definition for any new capability, contains information regarding the bfrc, HTTP Method, validating response body. Paymail Routes and Paymail Client take a base definition to extend the capabilities
 
-A handful of base capabilities have been implemented and it is easy to create any new additional capability. 
+A handful of common capabilities have been implemented based on there specification
 
 ## Class: Capability
 
