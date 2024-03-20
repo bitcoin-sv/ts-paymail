@@ -1,9 +1,9 @@
-import { Request, Response, RequestHandler } from 'express';
-import CapabilityDefinition from 'src/capabilityDefinition/capabilityDefinition.js';
+import { Request, Response, RequestHandler, NextFunction } from 'express';
+import Capability from 'src/capability/capability.js';
 
 class PaymailRoute {
     constructor(
-        private capability: CapabilityDefinition, 
+        private capability: Capability, 
         private endpoint: string,
         private domainLogicHandler: RequestHandler,
         protected bodyValidator?: (body: any) => any
@@ -26,19 +26,24 @@ class PaymailRoute {
         return { name, domain };
     }
 
-    protected async defaultHandler(req: Request, res: Response): Promise<any> {
-        const { name, domain } = this.getNameAndDomainFromRequest(req);
-        
-        if (this.bodyValidator) {
-            const body = this.bodyValidator(req.body);
-            if (body instanceof Error) {
-                return res.status(400).send(body.message);
+    protected async defaultHandler(req: Request, res: Response, next: NextFunction): Promise<any> {
+        try {
+            const { name, domain } = this.getNameAndDomainFromRequest(req);
+            
+            if (this.bodyValidator) {
+                const body = this.bodyValidator(req.body);
+                if (body instanceof Error) {
+                    return res.status(400).send(body.message);
+                }
             }
+            const response = await this.domainLogicHandler(name, domain, req.body);
+            const serializedResponse = this.serializeResponse(response);
+            return this.sendSuccessResponse(res, serializedResponse);
+        } catch (error) {
+            next(error);
         }
-        const response = await this.domainLogicHandler(name, domain, req.body);
-        const serializedResponse = this.serializeResponse(response);
-        return this.sendSuccessResponse(res, serializedResponse);
     }
+    
     
     protected serializeResponse(response): string {
         return JSON.stringify(response);

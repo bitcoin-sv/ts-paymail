@@ -1,7 +1,7 @@
-import CapabilityDefinition from './capabilityDefinition.js';
+import Capability from './capability.js';
 
 
-const RequestSenderValidationCapability = new CapabilityDefinition({
+const RequestSenderValidationCapability = new Capability({
     title: 'bsvalias Payment Addressing (Payer Validation)',
     authors: ['andy (nChain)'],
 });

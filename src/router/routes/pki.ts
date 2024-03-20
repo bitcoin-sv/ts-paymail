@@ -1,6 +1,6 @@
 import PaymailRoute from './route.js';
 import { RequestHandler } from 'express';
-import PublicKeyInfrastructureCapability from '../../capabilityDefinition/pkiCapability.js';
+import PublicKeyInfrastructureCapability from '../../capability/pkiCapability.js';
 
 interface PkiResponse {
     bsvalias: '1.0',
@@ -8,7 +8,7 @@ interface PkiResponse {
     pubkey: string,
 }
 
-export class PublicKeyInfrastructureRoute extends PaymailRoute  {
+export default class PublicKeyInfrastructureRoute extends PaymailRoute  {
     constructor(domainLogicHandler: RequestHandler, endpoint = '/id/:paymail') {
         super(PublicKeyInfrastructureCapability, endpoint, domainLogicHandler);
     }

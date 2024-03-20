@@ -1,7 +1,8 @@
 import express, { Router, ErrorRequestHandler } from 'express';
 import bodyParser from 'body-parser';
 import Route from './routes/route.js';
-import RequestSenderValidationCapability from '../capabilityDefinition/requestSenderValidationCapability.js';
+import RequestSenderValidationCapability from '../capability/requestSenderValidationCapability.js';
+
 
 class PaymailRouter {
     private router: Router;
@@ -29,13 +30,22 @@ class PaymailRouter {
         this.addWellKnownRouter();
         if (errorHandler) {
             this.router.use(errorHandler);
+        } else {
+            this.router.use(this.defaultErrorHandler());
+        }
+    }
+    
+    private defaultErrorHandler = () => {
+        return (err, req, res, next) => {
+            res.status(500).send(err.message);
         }
     }
 
     private addWellKnownRouter(): void {
         this.router.get('/.well-known/bsvalias', (req, res) => {
             const capabilities = this.routes.reduce((map, route) => {
-                map[route.getCode()] = this.joinUrl(this.baseUrl, route.getEndpoint());
+                const endpoint = route.getEndpoint().replace(/:paymail/g, '{alias}@{domain.tld}').replace(/:pubkey/g, '{pubkey}');
+                map[route.getCode()] = this.joinUrl(this.baseUrl, endpoint);
                 return map;
             }, {});
             capabilities[RequestSenderValidationCapability.getCode()] = !!this.requestSenderValidation;

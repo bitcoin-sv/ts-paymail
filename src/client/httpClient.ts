@@ -36,11 +36,11 @@ export default class HttpClient {
     try {
       const response = await this.fetch(url, requestOptions);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(await response.text());
       }
       return response;
     } catch (error) {
-      throw new Error(`Fetch error: ${error instanceof Error ? error.message : 'unknown error'}`);
+      throw error;
     } finally {
       clearTimeout(timeoutId);
     }

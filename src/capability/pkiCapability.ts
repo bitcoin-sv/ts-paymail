@@ -1,8 +1,8 @@
 import Joi from 'joi';
-import CapabilityDefinition from './capabilityDefinition.js';
+import Capability from './capability.js';
 
 
-  const PublicKeyInfrastructureCapability = new CapabilityDefinition({
+  const PublicKeyInfrastructureCapability = new Capability({
     code: 'pki',
     title: 'Public Key Infrastructure',
     authors: ['andy (nChain)', 'Ryan X. Charles (Money Button)'],

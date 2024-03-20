@@ -1,6 +1,6 @@
 import { Hash } from '@bsv/sdk'; 
 
-export default class CapabilityDefinition {
+export default class Capability {
     private code?: string;
     private title: string;
     private authors?: string[];
@@ -26,7 +26,7 @@ export default class CapabilityDefinition {
         method?: 'GET' | 'POST';
         responseBodyValidator?: (body: any) => any;
     }) {
-        if(!title) throw new Error('CapabilityDefinition requires a title');
+        if(!title) throw new Error('Capability requires a title');
         this.code = code;
         this.title = title;
         this.authors = authors || [];

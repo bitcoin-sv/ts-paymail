@@ -1,20 +1,20 @@
 import PaymailRoute from './route.js';
 import { RequestHandler } from 'express';
-import PublicProfileCapability from '../../capabilityDefinition/publicProfileCapability.js';
+import PublicProfileCapability from '../../capability/publicProfileCapability.js';
 
 interface PublicProfileResponse {
-    avatarUrl: string;
+    avatar: string;
     name: string;
 }
 
-export class PublicProfileRoute extends PaymailRoute  {
+export default class PublicProfileRoute extends PaymailRoute  {
     constructor(domainLogicHandler: RequestHandler, endpoint = '/public-profile/:paymail') {
         super(PublicProfileCapability, endpoint, domainLogicHandler);
     }
     
     protected serializeResponse(domainLogicResponse: PublicProfileResponse): string {
         return JSON.stringify({
-            avatarUrl: domainLogicResponse.avatarUrl,
+            avatar: domainLogicResponse.avatar,
             name: domainLogicResponse.name,
         });
     }

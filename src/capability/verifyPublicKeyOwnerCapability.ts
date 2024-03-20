@@ -1,8 +1,8 @@
 
 import Joi from 'joi';
-import CapabilityDefinition from './capabilityDefinition.js';
+import Capability from './capability.js';
 
-const VerifyPublicKeyOwnerCapability = new CapabilityDefinition({
+const VerifyPublicKeyOwnerCapability = new Capability({
     title: 'bsvalias public key verify (Verify Public Key Owner)',
     responseBodyValidator: (body) => {
       const schema = Joi.object({

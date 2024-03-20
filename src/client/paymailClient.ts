@@ -1,13 +1,13 @@
 import AbstractResolver from "./resolver/abstractResolver.js";
 import DNSResolver, { DNSResolverOptions } from "./resolver/dnsResolver.js";
 import HttpClient from "./httpClient.js";
-import CapabilityDefinition from "../capabilityDefinition/capabilityDefinition.js";
+import Capability from "../capability/capability.js";
 
-import PublicProfileCapability from "../capabilityDefinition/publicProfileCapability.js";
-import PublicKeyInfrastructureCapability from "../capabilityDefinition/pkiCapability.js";
-import P2pPaymentDestinationCapability from "../capabilityDefinition/p2pPaymentDestinationCapability.js";
-import ReceiveTransactionCapability from "../capabilityDefinition/p2pReceiveTransactionCapability.js";
-import VerifyPublicKeyOwnerCapability from "../capabilityDefinition/verifyPublicKeyOwnerCapability.js";
+import PublicProfileCapability from "../capability/publicProfileCapability.js";
+import PublicKeyInfrastructureCapability from "../capability/pkiCapability.js";
+import P2pPaymentDestinationCapability from "../capability/p2pPaymentDestinationCapability.js";
+import ReceiveTransactionCapability from "../capability/p2pReceiveTransactionCapability.js";
+import VerifyPublicKeyOwnerCapability from "../capability/verifyPublicKeyOwnerCapability.js";
 
 
 
@@ -69,7 +69,7 @@ export default class PaymailClient {
         return capabilities[aCapability];
     };
 
-    public request = async (aDomain: string, capability: CapabilityDefinition, body?: any) => {
+    public request = async (aDomain: string, capability: Capability, body?: any) => {
       const [name, domain] = aDomain.split('@');
       const url = await this.ensureCapabilityFor(domain, capability.getCode());
       const requestUrl = url.replace('{alias}', name).replace('{domain.tld}', domain);

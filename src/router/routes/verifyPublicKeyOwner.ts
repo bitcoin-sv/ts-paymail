@@ -1,6 +1,6 @@
 import PaymailRoute from './route.js';
 import { RequestHandler } from 'express';
-import VerifyPublicKeyOwnerCapability from 'src/capabilityDefinition/verifyPublicKeyOwnerCapability.js';
+import VerifyPublicKeyOwnerCapability from 'src/capability/verifyPublicKeyOwnerCapability.js';
 
 interface VerifyPublicKeyOwnerResponse {
     handle: string;
@@ -8,15 +8,14 @@ interface VerifyPublicKeyOwnerResponse {
     match: boolean;
 }
 
-export class VerifyPublicKeyOwnerRoute extends PaymailRoute  {
-    constructor(domainLogicHandler: RequestHandler, endpoint = '/verifypubkey/{alias}@{domain.tld}/{pubkey}') {
+export default class VerifyPublicKeyOwnerRoute extends PaymailRoute  {
+    constructor(domainLogicHandler: RequestHandler, endpoint = '/verifypubkey/:paymail/:pubkey') {
         super(VerifyPublicKeyOwnerCapability, endpoint, domainLogicHandler);
     }
     
     protected serializeResponse(domainLogicResponse: VerifyPublicKeyOwnerResponse): string {
         return JSON.stringify({
-            bsvalias: '1',
-            // TODO get handle from params
+            bsvalias: '1.0',
             "handle": domainLogicResponse.handle,
             "pubkey": domainLogicResponse.pubkey,
             "match": domainLogicResponse.match

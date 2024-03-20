@@ -2,6 +2,7 @@
 export default {
     preset: 'ts-jest',
     testEnvironment: 'node',
-    testPathIgnorePatterns: ['dist/']
-  }
+    testPathIgnorePatterns: ['dist/'],
+    testTimeout: 30000,
+}
   

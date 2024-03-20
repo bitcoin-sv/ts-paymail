@@ -1,9 +1,9 @@
 
 import Joi from 'joi';
-import CapabilityDefinition from './capabilityDefinition.js';
+import Capability from './capability.js';
 
 
-const P2pPaymentDestinationCapability = new CapabilityDefinition({
+const P2pPaymentDestinationCapability = new Capability({
     title: 'Get no monitored payment destination (p2p payment destination)',
     authors: ['Miguel Duarte (Money Button)', 'Ryan X. Charles (Money Button)', 'Ivan Mlinaric (Handcash)', 'Rafa (Handcash)'],
     version: '1.1',

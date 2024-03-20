@@ -1,16 +1,25 @@
 import express from 'express';
 import PaymailRouter from '../src/router/router.js';
 import { PublicProfileRoute } from '../src/router/routes/publicProfileRoute.js';
+import { mockUser1 } from './mockUser.js';
 const app = express();
 
 const baseUrl = 'http://localhost:3000';
-const capabilities = [
-    new PublicProfileRoute((name, domain) => {
-        return { name, domain, avatarUrl: `https://avatar.com/${name}@${domain}` };
-    }),
-];
 
-const paymailRouter = new PaymailRouter(baseUrl, capabilities);
+const publicProfileRoute = new PublicProfileRoute((name, domain) => {
+    if (name === mockUser1.getAlias()) {
+        return {
+            name: mockUser1.getAlias(),
+            domain,
+            avatarUrl: mockUser1.getAvatarUrl()
+        }
+    }
+    throw new Error('User not found')
+})
+
+const routes = [publicProfileRoute];
+
+const paymailRouter = new PaymailRouter(baseUrl, routes);
 
 app.use(paymailRouter.getRouter());
 
