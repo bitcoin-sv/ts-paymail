@@ -2,7 +2,7 @@ import express from 'express';
 import PaymailRouter from '../../dist/cjs/src/router/router.js';
 import PublicProfileRoute from '../../dist/cjs/src/router/routes/publicProfileRoute.js';
 import PaymailClient from '../../dist/cjs/src/client/paymailClient.js';
-import { mockUser1 } from '../../dist/cjs/examples/MockUser.js';
+import { mockUser1 } from '../../dist/cjs/examples/mockUser.js';
 
 describe('#Paymail Server - End to end test with PaymailClient and Server', () => {
   let app;
