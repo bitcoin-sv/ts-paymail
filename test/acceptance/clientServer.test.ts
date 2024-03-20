@@ -4,7 +4,6 @@ import PublicProfileRoute from '../../dist/cjs/src/router/routes/publicProfileRo
 import PaymailClient from '../../dist/cjs/src/client/paymailClient.js';
 import httpClient from '../../dist/cjs/src/client/httpClient.js';
 import { mockUser1 } from '../../dist/cjs/examples/mockUser.js';
-import fetch from 'node-fetch';
 
 describe('#Paymail Server - End to end test with PaymailClient and Server', () => {
   let app;

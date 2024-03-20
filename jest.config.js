@@ -4,5 +4,6 @@ export default {
     testEnvironment: 'node',
     testPathIgnorePatterns: ['dist/'],
     testTimeout: 30000,
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 }
   
