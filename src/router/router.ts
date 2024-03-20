@@ -1,16 +1,16 @@
 import express, { Router, ErrorRequestHandler } from 'express';
 import bodyParser from 'body-parser';
-import Route from './routes/route.js';
+import PaymailRoute from './routes/route.js';
 import RequestSenderValidationCapability from '../capability/requestSenderValidationCapability.js';
 
 
-class PaymailRouter {
+export default class PaymailRouter {
     private router: Router;
     public baseUrl: string;
-    public routes: Route[];
+    public routes: PaymailRoute[];
     public requestSenderValidation: boolean;
 
-    constructor(baseUrl: string, routes: Route[], errorHandler?: ErrorRequestHandler, requestSenderValidation?: boolean) {
+    constructor(baseUrl: string, routes: PaymailRoute[], errorHandler?: ErrorRequestHandler, requestSenderValidation?: boolean) {
         this.baseUrl = baseUrl;
         this.router = express.Router();
         this.router.use(bodyParser.json({  type: 'application/json' }))
@@ -66,5 +66,3 @@ class PaymailRouter {
         return this.router;
     }
 }
-
-export default PaymailRouter;

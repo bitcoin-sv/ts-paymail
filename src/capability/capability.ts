@@ -16,7 +16,7 @@ export default class Capability {
         version,
         supersedes,
         responseBodyValidator,
-        method,
+        method
     }: {
         code?: string;
         title: string;

@@ -18,4 +18,4 @@ export default new Capability({
       }
       return value;
     },
-  });
+});

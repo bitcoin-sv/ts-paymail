@@ -1,7 +1,7 @@
 import { Request, Response, RequestHandler, NextFunction } from 'express';
 import Capability from 'src/capability/capability.js';
 
-class PaymailRoute {
+export default class PaymailRoute {
     constructor(
         private capability: Capability, 
         private endpoint: string,
@@ -69,5 +69,3 @@ class PaymailRoute {
         return this.capability.getMethod();
     }
 }
-
-export default PaymailRoute;

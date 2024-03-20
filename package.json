@@ -12,7 +12,7 @@
     "build": "tsc -b && tsconfig-to-dual-package tsconfig.cjs.json",
     "dev": "tsc -b -w",
     "prepublish": "npm run build",
-    "doc": "ts2md ...todo add script here"
+    "doc": "ts2md --inputFilename=src/capability/index.ts --outputFilename=docs/capability.md --filenameSubString=capability --firstHeadingLevel=1 && ts2md --inputFilename=src/client/index.ts --outputFilename=docs/paymailClient.md --filenameSubString=paymailClient --firstHeadingLevel=1 && npx ts2md --inputFilename=src/router/index.ts --outputFilename=docs/paymailRouter.md --filenameSubString=router --firstHeadingLevel=1"
   },
   "author": "BSV Blockchain Association",
   "license": "SEE LICENSE IN LICENSE.txt",
