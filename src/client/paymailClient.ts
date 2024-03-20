@@ -17,8 +17,8 @@ export default class PaymailClient {
     private _localHostPort: number;
     private httpClient: HttpClient;
 
-    constructor(dnsOptions?: DNSResolverOptions, localhostPort?: number,) {
-        this.httpClient = new HttpClient(fetch);
+    constructor(httpClient?: HttpClient, dnsOptions?: DNSResolverOptions, localhostPort?: number) {
+        this.httpClient = httpClient ? httpClient : new HttpClient(fetch);
         this._domainCapabilityCache = new Map();
         this._resolver =  new DNSResolver(dnsOptions, this.httpClient);
         this._localHostPort = localhostPort || 3000;

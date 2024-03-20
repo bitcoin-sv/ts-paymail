@@ -1,10 +1,12 @@
 import PaymailClient from '../../../dist/cjs/src/client/paymailClient.js';
+import HttpClient from '../../../dist/cjs/src/client/httpClient.js';
+import fetch from 'node-fetch';
 
 describe('#PaymailClient - Public Key Infrastructure', () => {
     let paymailClient;
 
     beforeAll(() => {
-        paymailClient = new PaymailClient();
+        paymailClient = new PaymailClient(new HttpClient(fetch));
     });
 
     it('should retrieve the public key for a given paymail handle', async () => {

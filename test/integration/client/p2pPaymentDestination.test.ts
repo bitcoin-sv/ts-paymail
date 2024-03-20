@@ -1,10 +1,12 @@
 import PaymailClient from '../../../dist/cjs/src/client/paymailClient.js';
+import HttpClient from '../../../dist/cjs/src/client/httpClient.js';
+import fetch from 'node-fetch';
 
 describe('#PaymailClient - P2P Payment Destination', () => {
     let paymailClient: PaymailClient;
 
     beforeAll(() => {
-        paymailClient = new PaymailClient();
+        paymailClient = new PaymailClient(new HttpClient(fetch));
     });
 
     it('should get payment destinations with reference', async () => {

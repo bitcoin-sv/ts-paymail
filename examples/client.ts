@@ -1,4 +1,5 @@
 import PaymailClient from '../src/client/paymailClient.js';
+
 const client = new PaymailClient();
 
 (async () => {

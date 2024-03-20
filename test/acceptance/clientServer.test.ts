@@ -2,7 +2,9 @@ import express from 'express';
 import PaymailRouter from '../../dist/cjs/src/router/router.js';
 import PublicProfileRoute from '../../dist/cjs/src/router/routes/publicProfileRoute.js';
 import PaymailClient from '../../dist/cjs/src/client/paymailClient.js';
+import httpClient from '../../dist/cjs/src/client/httpClient.js';
 import { mockUser1 } from '../../dist/cjs/examples/mockUser.js';
+import fetch from 'node-fetch';
 
 describe('#Paymail Server - End to end test with PaymailClient and Server', () => {
   let app;
@@ -27,7 +29,7 @@ describe('#Paymail Server - End to end test with PaymailClient and Server', () =
     const paymailRouter = new PaymailRouter(baseUrl, routes);
     app.use(paymailRouter.getRouter());
     server = app.listen(3000, done);
-    client = new PaymailClient();
+    client = new PaymailClient(new httpClient(fetch));
   });
 
   afterAll((done) => {
