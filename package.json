@@ -9,6 +9,8 @@
     "test:watch": "npm run build && jest --watch",
     "test:coverage": "npm run build && jest --coverage",
     "lint": "ts-standard --fix src/**/*.ts",
+    "ex-lint": "ts-standard --fix examples/**/*.ts",
+    "docs-lint": "ts-standard --fix docs/**/*.ts",
     "build": "tsc -b && tsconfig-to-dual-package tsconfig.cjs.json",
     "dev": "tsc -b -w",
     "prepublish": "npm run build",
@@ -41,7 +43,6 @@
     "node-fetch": "^2",
     "supertest": "^6.3.4",
     "ts-jest": "^29.1.1",
-    "ts-standard": "^12.0.2",
     "ts2md": "^0.2.0",
     "tsconfig-to-dual-package": "^1.2.0",
     "typescript": "^5.2.2"
@@ -52,6 +53,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.34.0",
-    "eslint-plugin-react-hooks": "^4.6.0"
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "ts-standard": "^12.0.2"
   }
 }
