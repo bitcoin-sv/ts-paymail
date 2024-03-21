@@ -1,9 +1,8 @@
-import Capability from './capability.js';
-
+import Capability from './capability.js'
 
 const RequestSenderValidationCapability = new Capability({
-    title: 'bsvalias Payment Addressing (Payer Validation)',
-    authors: ['andy (nChain)'],
-});
+  title: 'bsvalias Payment Addressing (Payer Validation)',
+  authors: ['andy (nChain)']
+})
 
-export default RequestSenderValidationCapability;
+export default RequestSenderValidationCapability
