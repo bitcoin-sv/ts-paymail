@@ -1,6 +1,6 @@
 import PaymailRoute from './paymailRoute.js';
 import { RequestHandler } from 'express';
-import VerifyPublicKeyOwnerCapability from 'src/capability/verifyPublicKeyOwnerCapability.js';
+import VerifyPublicKeyOwnerCapability from '../../capability/verifyPublicKeyOwnerCapability.js';
 
 interface VerifyPublicKeyOwnerResponse {
     handle: string;

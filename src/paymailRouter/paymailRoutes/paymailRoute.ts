@@ -1,5 +1,5 @@
 import { Request, Response, RequestHandler, NextFunction } from 'express';
-import Capability from 'src/capability/capability.js';
+import Capability from '../../capability/capability.js';
 
 export default class PaymailRoute {
     constructor(
