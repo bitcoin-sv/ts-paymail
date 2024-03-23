@@ -2,8 +2,57 @@
   "name": "@bsv/ts-paymail",
   "version": "1.0.0",
   "description": "BSV Paymail library",
-  "main": "index.js",
+  "main": "dist/cjs/mod.js",
+  "module": "dist/esm/mod.js",
+  "types": "dist/types/mod.d.ts",
   "type": "module",
+  "files": [
+    "dist",
+    "src",
+    "docs"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/mod.d.ts",
+      "import": "./dist/esm/mod.js",
+      "require": "./dist/cjs/mod.js"
+    },
+    "./*.ts": {
+      "types": "./dist/types/src/*.d.ts",
+      "import": "./dist/esm/src/*.js",
+      "require": "./dist/cjs/src/*.js"
+    },
+    "./paymailClient": {
+      "import": "./dist/esm/src/paymailClient/index.js",
+      "require": "./dist/cjs/src/paymailClient/index.js",
+      "types": "./dist/types/src/paymailClient/index.d.ts"
+    },
+    "./paymailClient/*": {
+      "import": "./dist/esm/src/paymailClient/*.js",
+      "require": "./dist/cjs/src/paymailClient/*.js",
+      "types": "./dist/types/src/paymailClient/*.d.ts"
+    },
+    "./capability": {
+      "import": "./dist/esm/src/capability/index.js",
+      "require": "./dist/cjs/src/capability/index.js",
+      "types": "./dist/types/src/capability/index.d.ts"
+    },
+    "./capability/*": {
+      "import": "./dist/esm/src/capability/*.js",
+      "require": "./dist/cjs/src/capability/*.js",
+      "types": "./dist/types/src/capability/*.d.ts"
+    },
+    "./paymailRouter": {
+      "import": "./dist/esm/src/paymailRouter/index.js",
+      "require": "./dist/cjs/src/paymailRouter/index.js",
+      "types": "./dist/types/src/paymailRouter/index.d.ts"
+    },
+    "./transaction/*": {
+      "import": "./dist/esm/src/paymailRouter/*.js",
+      "require": "./dist/cjs/src/paymailRouter/*.js",
+      "types": "./dist/types/src/paymailRouter/*.d.ts"
+    }
+  },
   "scripts": {
     "test": "npm run build && jest --testTimeout=15000",
     "test:watch": "npm run build && jest --watch",

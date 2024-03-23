@@ -1,4 +1,4 @@
-import PaymailRoute from './route.js';
+import PaymailRoute from './paymailRoute.js';
 import { RequestHandler } from 'express';
 import PublicKeyInfrastructureCapability from '../../capability/pkiCapability.js';
 

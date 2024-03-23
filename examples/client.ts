@@ -1,4 +1,4 @@
-import PaymailClient from '../src/client/paymailClient.js'
+import PaymailClient from '../src/paymailClient/paymailClient.js'
 
 const client = new PaymailClient();
 

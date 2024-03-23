@@ -1,5 +1,5 @@
-import PaymailClient from '../../../dist/cjs/src/client/paymailClient.js';
-import HttpClient from '../../../dist/cjs/src/client/httpClient.js';
+import PaymailClient from '../../../dist/cjs/src/paymailClient/paymailClient.js';
+import HttpClient from '../../../dist/cjs/src/paymailClient/httpClient.js';
 
 describe('#PaymailClient - Public Profile', () => {
     let paymailClient: PaymailClient;

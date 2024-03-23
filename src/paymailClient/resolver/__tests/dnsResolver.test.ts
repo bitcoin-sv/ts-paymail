@@ -1,7 +1,7 @@
-import DNSResolver from '../../../dist/cjs/src/client/resolver/dnsResolver.js';
 import { describe, it, expect } from '@jest/globals';
 import dns from 'dns';
-import HttpClient from '../../../src/client/httpClient';
+import DNSResolver from '../../../../dist/cjs/src/paymailClient/resolver/dnsResolver.js';
+import HttpClient from '../../../../dist/cjs/src/paymailClient/httpClient.js';
 
 describe('# DNS resolver', () => {
     it('should resolve SRV records for handcash.io', async () => {

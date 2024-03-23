@@ -1,5 +1,5 @@
 
-import PaymailRoute from './route.js';
+import PaymailRoute from './paymailRoute.js';
 import { RequestHandler } from 'express';
 import P2pPaymentDestinationCapability from '../../capability/p2pPaymentDestinationCapability.js';
 import joi from 'joi';

@@ -1,6 +1,6 @@
 import express, { Router, ErrorRequestHandler } from 'express'
 import bodyParser from 'body-parser'
-import PaymailRoute from './routes/route.js'
+import PaymailRoute from './paymailRoutes/paymailRoute.js'
 import RequestSenderValidationCapability from '../capability/requestSenderValidationCapability.js'
 
 export default class PaymailRouter {

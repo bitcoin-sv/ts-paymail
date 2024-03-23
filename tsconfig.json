@@ -13,11 +13,5 @@
     {
       "path": "tsconfig.types.json"
     },
-    {
-      "path": "tsconfig.examples.json"
-    },
-    {
-      "path": "tsconfig.test.json"
-    }
   ]
 }

@@ -1,6 +1,6 @@
 import express from 'express'
-import PaymailRouter from '../src/router/router.js'
-import PublicProfileRoute from '../src/router/routes/publicProfileRoute.js'
+import PaymailRouter from '../src/paymailRouter/paymailRouter.js'
+import PublicProfileRoute from '../src/paymailRouter/paymailRoutes/publicProfileRoute.js'
 import { mockUser1 } from './mockUser.js'
 const app = express()
 
