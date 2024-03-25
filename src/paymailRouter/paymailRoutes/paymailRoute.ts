@@ -1,5 +1,6 @@
 import { Request, Response, RequestHandler, NextFunction } from 'express'
 import Capability from '../../capability/capability.js'
+import { PaymailBadRequestError } from '../../errors/index.js'
 
 export default class PaymailRoute {
   constructor (
@@ -30,7 +31,7 @@ export default class PaymailRoute {
 
       if (this.bodyValidator) {
         const body = this.bodyValidator(req.body)
-        if (body instanceof Error) {
+        if (body instanceof PaymailBadRequestError) {
           return res.status(400).send(body.message)
         }
       }

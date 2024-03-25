@@ -7,7 +7,6 @@ export default class Capability {
   private readonly version?: string
   private readonly supersedes?: string[]
   private readonly method?: 'GET' | 'POST'
-  private readonly responseBodyValidator?: (body: any) => any
 
   constructor ({
     code,
@@ -15,7 +14,6 @@ export default class Capability {
     authors,
     version,
     supersedes,
-    responseBodyValidator,
     method
   }: {
     code?: string
@@ -24,7 +22,6 @@ export default class Capability {
     version?: string
     supersedes?: string[]
     method?: 'GET' | 'POST'
-    responseBodyValidator?: (body: any) => any
   }) {
     if (!title) throw new Error('Capability requires a title')
     this.code = code
@@ -33,7 +30,6 @@ export default class Capability {
     this.version = version
     this.supersedes = supersedes
     this.method = method
-    this.responseBodyValidator = responseBodyValidator
   }
 
   public getCode (): string {
@@ -42,13 +38,6 @@ export default class Capability {
 
   public getMethod (): 'GET' | 'POST' {
     return this.method || 'GET'
-  }
-
-  public validateBody (body: any): any {
-    if (this.responseBodyValidator) {
-      return this.responseBodyValidator(body)
-    }
-    return body
   }
 
   private bfrc () {

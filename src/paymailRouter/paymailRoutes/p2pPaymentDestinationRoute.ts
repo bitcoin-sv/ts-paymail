@@ -2,6 +2,7 @@
 import PaymailRoute from './paymailRoute.js'
 import { RequestHandler } from 'express'
 import P2pPaymentDestinationCapability from '../../capability/p2pPaymentDestinationCapability.js'
+import { PaymailBadRequestError } from '../../errors/index.js'
 import joi from 'joi'
 
 interface P2pDestination {
@@ -27,7 +28,7 @@ export default class P2pPaymentDestinationRoute extends PaymailRoute {
       })
       const { error, value } = schema.validate(body)
       if (error) {
-        return new Error('Invalid body: ' + error.message)
+        return new PaymailBadRequestError('Invalid body: ' + error.message)
       }
       return value
     }

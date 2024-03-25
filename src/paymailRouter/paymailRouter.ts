@@ -2,6 +2,7 @@ import express, { Router, ErrorRequestHandler } from 'express'
 import bodyParser from 'body-parser'
 import PaymailRoute from './paymailRoutes/paymailRoute.js'
 import RequestSenderValidationCapability from '../capability/requestSenderValidationCapability.js'
+import { PaymailBadRequestError } from '../errors/index.js';
 
 export default class PaymailRouter {
   private readonly router: Router
@@ -23,7 +24,7 @@ export default class PaymailRouter {
       } else if (method === 'POST') {
         this.router.post(route.getEndpoint(), route.getHandler())
       } else {
-        throw new Error('Unsupported method: ' + method)
+        throw new PaymailBadRequestError('Unsupported method: ' + method)
       }
     })
     this.addWellKnownRouter()

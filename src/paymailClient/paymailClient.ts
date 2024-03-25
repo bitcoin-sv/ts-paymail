@@ -2,6 +2,8 @@ import AbstractResolver from './resolver/abstractResolver.js'
 import DNSResolver, { DNSResolverOptions } from './resolver/dnsResolver.js'
 import HttpClient from './httpClient.js'
 import Capability from '../capability/capability.js'
+import Joi from 'joi'
+import { PaymailServerResponseError } from '../errors/index.js'
 
 import PublicProfileCapability from '../capability/publicProfileCapability.js'
 import PublicKeyInfrastructureCapability from '../capability/pkiCapability.js'
@@ -75,23 +77,57 @@ export default class PaymailClient {
       body
     })
     const responseBody = await response.json()
-    return capability.validateBody(responseBody)
+    return responseBody
   }
 
   public getPublicProfile = async (paymail) => {
-    return await this.request(paymail, PublicProfileCapability)
+    const response = await this.request(paymail, PublicProfileCapability)
+    const schema = Joi.object({
+      name: Joi.string().required(),
+      avatar: Joi.string().uri().required()
+    })
+
+    const { error, value } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return value
   }
 
   public getPki = async (paymail) => {
-    return await this.request(paymail, PublicKeyInfrastructureCapability)
+    const response = await this.request(paymail, PublicKeyInfrastructureCapability)
+    const schema = Joi.object({
+      bsvalias: Joi.string().optional().allow('1.0'),
+      handle: Joi.string().required(),
+      pubkey: Joi.string().required()
+    })
+    const { error, value } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return value
   }
 
   public getP2pPaymentDestination = async (paymail, satoshis: number) => {
     const response = await this.request(paymail, P2pPaymentDestinationCapability, {
       satoshis
+    });
+
+    const schema = Joi.object({
+      outputs: Joi.array().items(
+        Joi.object({
+          script: Joi.string().required(),
+          satoshis: Joi.number().required()
+        }).required().min(1)),
+      reference: Joi.string().required()
     })
+    const { error } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+
     if (satoshis !== response.outputs.reduce((acc, output) => acc + output.satoshis, 0)) {
-      throw new Error('The server did not return the expected amount of satoshis')
+      throw new PaymailServerResponseError('The server did not return the expected amount of satoshis')
     }
     return response
   }
@@ -102,11 +138,22 @@ export default class PaymailClient {
     signature: string
     note: string
   }) => {
-    return await this.request(paymail, ReceiveTransactionCapability, {
+    const response = await this.request(paymail, ReceiveTransactionCapability, {
       txHex,
       reference,
       metadata
+    });
+
+    const schema = Joi.object({
+      txid: Joi.string().required(),
+      note: Joi.string()
     })
+    const { error, value } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return value
+
   }
 
   public verifyPublicKey = async (paymail, pubkey) => {
@@ -115,6 +162,17 @@ export default class PaymailClient {
     const requestUrl = url.replace('{alias}', name).replace('{domain.tld}', domain).replace('{pubkey}', pubkey)
     const response = await this.httpClient.request(requestUrl)
     const responseBody = await response.json()
-    return VerifyPublicKeyOwnerCapability.validateBody(responseBody)
+
+    const schema = Joi.object({
+      bsvalias: Joi.string().optional().allow('1.0'),
+      handle: Joi.string().required(),
+      pubkey: Joi.string().required(),
+      match: Joi.boolean().required()
+    })
+    const { error } = schema.validate(responseBody)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return responseBody;
   }
 }
