@@ -1,6 +1,6 @@
+import { PaymailServerResponseError } from '../errors/index.js'
 type Fetch = typeof fetch
 type FetchOptions = RequestInit & { timeout?: number }
-import { PaymailError } from "../errors/index.js";
 
 export default class HttpClient {
   private readonly fetch: Fetch
@@ -37,7 +37,7 @@ export default class HttpClient {
     try {
       const response = await this.fetch(url, requestOptions)
       if (!response.ok) {
-        throw new PaymailError(await response.text(), 503)
+        throw new PaymailServerResponseError(await response.text())
       }
       return response
     } catch (error) {

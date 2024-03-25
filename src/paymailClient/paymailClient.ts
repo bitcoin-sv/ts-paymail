@@ -3,7 +3,7 @@ import DNSResolver, { DNSResolverOptions } from './resolver/dnsResolver.js'
 import HttpClient from './httpClient.js'
 import Capability from '../capability/capability.js'
 import Joi from 'joi'
-import { PaymailServerResponseError } from '../errors/index.js'
+import { PaymailError, PaymailServerResponseError } from '../errors/index.js'
 
 import PublicProfileCapability from '../capability/publicProfileCapability.js'
 import PublicKeyInfrastructureCapability from '../capability/pkiCapability.js'
@@ -36,15 +36,15 @@ export default class PaymailClient {
 
     const url = `${protocol}${domain}:${port}/.well-known/bsvalias`
     const response = await fetch(url)
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch well-known for "${aDomain}" with URL: ${url}`)
-    }
-
     const json = await response.json()
-    if (json.bsvalias !== '1.0') throw new Error(`Domain "${aDomain}" is not on bsvalias version 1.0`)
-    if (!json.capabilities) throw new Error(`Domain "${aDomain}" invalid response does not have any capabilities`)
-
+    const schema = Joi.object({
+      bsvalias: Joi.string().required(),
+      capabilities: Joi.object().required()
+    })
+    const { error } = schema.validate(json)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
     return json.capabilities
   }
 
@@ -63,7 +63,7 @@ export default class PaymailClient {
   public ensureCapabilityFor = async (aDomain, aCapability) => {
     const capabilities = await this.getDomainCapabilities(aDomain)
     if (!capabilities[aCapability]) {
-      throw new Error(`Domain "${aDomain}" does not support capability "${aCapability}"`)
+      throw new PaymailError(`Domain "${aDomain}" does not support capability "${aCapability}"`, 401)
     }
     return capabilities[aCapability]
   }
@@ -111,7 +111,7 @@ export default class PaymailClient {
   public getP2pPaymentDestination = async (paymail, satoshis: number) => {
     const response = await this.request(paymail, P2pPaymentDestinationCapability, {
       satoshis
-    });
+    })
 
     const schema = Joi.object({
       outputs: Joi.array().items(
@@ -142,7 +142,7 @@ export default class PaymailClient {
       txHex,
       reference,
       metadata
-    });
+    })
 
     const schema = Joi.object({
       txid: Joi.string().required(),
@@ -153,7 +153,6 @@ export default class PaymailClient {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
     }
     return value
-
   }
 
   public verifyPublicKey = async (paymail, pubkey) => {
@@ -173,6 +172,6 @@ export default class PaymailClient {
     if (error) {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
     }
-    return responseBody;
+    return responseBody
   }
 }

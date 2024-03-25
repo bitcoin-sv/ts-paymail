@@ -82,7 +82,7 @@ class DNSResolver extends AbstractResolver {
       }
     }
     if (dohResponse.Status !== 0 || !dohResponse.Answer) {
-      throw new Error(`${this.domainWithoutBsvAliasPrefix(aDomain)} is not correctly configured: insecure domain`)
+      throw new PaymailServerResponseError(`${this.domainWithoutBsvAliasPrefix(aDomain)} is not correctly configured: insecure domain`)
     }
 
     const data = dohResponse.Answer[0].data.split(' ')

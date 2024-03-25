@@ -2,7 +2,7 @@ import express, { Router, ErrorRequestHandler } from 'express'
 import bodyParser from 'body-parser'
 import PaymailRoute from './paymailRoutes/paymailRoute.js'
 import RequestSenderValidationCapability from '../capability/requestSenderValidationCapability.js'
-import { PaymailBadRequestError } from '../errors/index.js';
+import { PaymailBadRequestError } from '../errors/index.js'
 
 export default class PaymailRouter {
   private readonly router: Router
