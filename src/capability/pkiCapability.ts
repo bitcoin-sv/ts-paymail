@@ -11,7 +11,7 @@ const PublicKeyInfrastructureCapability = new Capability({
 
     const schema = Joi.object({
       bsvalias: Joi.string().valid('1.0').required(),
-      handle: Joi.string().pattern(new RegExp('^[^@]+@[^.]+\\.[^.]+$')).required(),
+      handle: Joi.string().required(),
       pubkey: Joi.string().pattern(pubkeyRegex).required()
     })
 

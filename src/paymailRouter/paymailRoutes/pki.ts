@@ -15,8 +15,8 @@ export default class PublicKeyInfrastructureRoute extends PaymailRoute {
 
   protected serializeResponse (domainLogicResponse: PkiResponse): string {
     return JSON.stringify({
-      bsvalias: '1',
-      // TODO get handle from params
+      bsvalias: '1.0',
+
       handle: domainLogicResponse.handle,
       pubkey: domainLogicResponse.pubkey
     })

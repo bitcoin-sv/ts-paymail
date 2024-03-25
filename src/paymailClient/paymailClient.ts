@@ -96,7 +96,7 @@ export default class PaymailClient {
     return response
   }
 
-  public sendTransactionP2P = async (paymail, txHex: string, reference: string, metadata: {
+  public sendTransactionP2P = async (paymail: string, txHex: string, reference: string, metadata?: {
     sender: string
     pubkey: string
     signature: string
