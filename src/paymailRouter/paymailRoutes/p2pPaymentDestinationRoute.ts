@@ -27,7 +27,7 @@ export default class P2pPaymentDestinationRoute extends PaymailRoute {
       })
       const { error, value } = schema.validate(body)
       if (error) {
-        return new PaymailBadRequestError('Invalid body: ' + error.message)
+        throw new PaymailBadRequestError('Invalid body: ' + error.message)
       }
       return value
     }
