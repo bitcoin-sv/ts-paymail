@@ -18,10 +18,9 @@ interface P2pDestinationsResponse {
 export default class P2pPaymentDestinationRoute extends PaymailRoute {
   constructor (domainLogicHandler: RequestHandler, endpoint = '/p2p-payment-destination/:paymail') {
     super(P2pPaymentDestinationCapability, endpoint, domainLogicHandler)
-    this.bodyValidator = this.getBodyValidator()
   }
 
-  private getBodyValidator (): (body: any) => any {
+  protected getBodyValidator (): (body: any) => any {
     return (body: any) => {
       const schema = joi.object({
         satoshis: joi.number().required()

@@ -3,13 +3,14 @@ import DNSResolver, { DNSResolverOptions } from './resolver/dnsResolver.js'
 import HttpClient from './httpClient.js'
 import Capability from '../capability/capability.js'
 import Joi from 'joi'
-import { PaymailError, PaymailServerResponseError } from '../errors/index.js'
+import { PaymailServerResponseError } from '../errors/index.js'
 
 import PublicProfileCapability from '../capability/publicProfileCapability.js'
 import PublicKeyInfrastructureCapability from '../capability/pkiCapability.js'
 import P2pPaymentDestinationCapability from '../capability/p2pPaymentDestinationCapability.js'
 import ReceiveTransactionCapability from '../capability/p2pReceiveTransactionCapability.js'
 import VerifyPublicKeyOwnerCapability from '../capability/verifyPublicKeyOwnerCapability.js'
+import ReceiveBeefTransactionCapability from '../capability/p2pReceiveBeefTransactionCapability.js'
 
 export default class PaymailClient {
   private readonly _domainCapabilityCache: Map<string, Map<string, any>>
@@ -63,7 +64,7 @@ export default class PaymailClient {
   public ensureCapabilityFor = async (aDomain, aCapability) => {
     const capabilities = await this.getDomainCapabilities(aDomain)
     if (!capabilities[aCapability]) {
-      throw new PaymailError(`Domain "${aDomain}" does not support capability "${aCapability}"`, 401)
+      throw new PaymailServerResponseError(`Domain "${aDomain}" does not support capability "${aCapability}"`)
     }
     return capabilities[aCapability]
   }
@@ -173,5 +174,28 @@ export default class PaymailClient {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
     }
     return responseBody
+  }
+
+  public sendBeefTransactionP2P = async (paymail: string, txHex: string, reference: string, metadata?: {
+    sender: string
+    pubkey: string
+    signature: string
+    note: string
+  }) => {
+    const response = await this.request(paymail, ReceiveBeefTransactionCapability, {
+      txHex,
+      reference,
+      metadata
+    })
+
+    const schema = Joi.object({
+      txid: Joi.string().required(),
+      note: Joi.string()
+    })
+    const { error, value } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return value
   }
 }

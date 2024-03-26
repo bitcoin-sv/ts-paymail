@@ -28,12 +28,9 @@ export default class PaymailRoute {
   protected async defaultHandler (req: Request, res: Response, next: NextFunction): Promise<any> {
     try {
       const { name, domain } = this.getNameAndDomainFromRequest(req)
-
-      if (this.bodyValidator) {
-        const body = this.bodyValidator(req.body)
-        if (body instanceof PaymailBadRequestError) {
-          return res.status(400).send(body.message)
-        }
+      if (this.getBodyValidator()) {
+        const validateBody = this.getBodyValidator()
+        validateBody(req.body)
       }
       const response = await this.domainLogicHandler(name, domain, req.body)
       const serializedResponse = this.serializeResponse(response)
@@ -65,5 +62,9 @@ export default class PaymailRoute {
 
   public getMethod (): 'GET' | 'POST' {
     return this.capability.getMethod()
+  }
+
+  protected getBodyValidator (): (body: any) => any {
+    return this.bodyValidator
   }
 }

@@ -1,24 +1,26 @@
 import { RequestHandler } from 'express'
-import Joi from 'joi'
-import { Transaction } from '@bsv/sdk'
+import { Transaction } from '@bsv/sdk';
+import Joi from 'joi';
+
 import PaymailRoute from './paymailRoute.js'
-import P2pReceiveTransactionCapability from '../../capability/p2pReceiveTransactionCapability.js'
-import { PaymailBadRequestError } from '../../errors/index.js'
+import P2pReceiveBeefTransactionCapability from '../../capability/p2pReceiveBeefTransactionCapability.js';
+import { PaymailBadRequestError } from '../../errors/index.js';
+
 
 interface ReceiveTransactionResponse {
   txid: string
   note?: string
 }
 
-export default class ReceiveTransactionRoute extends PaymailRoute {
-  constructor (domainLogicHandler: RequestHandler, endpoint = '/receive-transaction/:paymail') {
-    super(P2pReceiveTransactionCapability, endpoint, domainLogicHandler)
+export default class ReceiveBeefTransactionRoute extends PaymailRoute {
+  constructor (domainLogicHandler: RequestHandler, endpoint = '/receive-beef-transaction/:paymail') {
+    super(P2pReceiveBeefTransactionCapability, endpoint, domainLogicHandler)
   }
 
   protected getBodyValidator (): (body: any) => any {
     return (body: any) => {
       const schema = Joi.object({
-        hex: Joi.string().required(),
+        beef: Joi.string().required(),
         metadata: Joi.object({
           sender: Joi.string(),
           pubkey: Joi.string(),
@@ -32,7 +34,7 @@ export default class ReceiveTransactionRoute extends PaymailRoute {
         throw new PaymailBadRequestError(error.message);
       }
       try {
-        Transaction.fromHex(body.hex)
+        Transaction.fromHexBEEF(body.beef)
       } catch (error) {
         throw new PaymailBadRequestError('Invalid body: ' + error.message)
       }
@@ -44,7 +46,7 @@ export default class ReceiveTransactionRoute extends PaymailRoute {
   protected serializeResponse (domainLogicResponse: ReceiveTransactionResponse): string {
     return JSON.stringify({
       txid: domainLogicResponse.txid,
-      note: domainLogicResponse.note || ''
+      note: domainLogicResponse.note || '',
     })
   }
 }

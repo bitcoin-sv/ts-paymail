@@ -5,3 +5,4 @@ export { default as P2pPaymentDestinationCapability } from './p2pPaymentDestinat
 export { default as ReceiveTransactionCapability } from './p2pReceiveTransactionCapability.js'
 export { default as RequestSenderValidationCapability } from './requestSenderValidationCapability.js'
 export { default as VerifyPublicKeyOwnerCapability } from './verifyPublicKeyOwnerCapability.js'
+export { default as P2pReceiveBeefTransactionCapability } from './p2pReceiveBeefTransactionCapability.js'

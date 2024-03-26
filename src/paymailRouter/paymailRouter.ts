@@ -30,13 +30,15 @@ export default class PaymailRouter {
     this.addWellKnownRouter()
     if (errorHandler) {
       this.router.use(errorHandler)
-    } else {
-      this.router.use(this.defaultErrorHandler())
     }
+    this.router.use(this.defaultErrorHandler())
   }
 
   private readonly defaultErrorHandler = () => {
     return (err, req, res, next) => {
+      if (err instanceof PaymailBadRequestError) {
+        return res.status(400).send(err.message)
+      }
       res.status(500).send(err.message)
     }
   }
