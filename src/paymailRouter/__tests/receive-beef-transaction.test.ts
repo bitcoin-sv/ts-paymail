@@ -3,26 +3,33 @@ import express from 'express'
 import PaymailRouter from '../../../dist/cjs/src/paymailRouter/paymailRouter.js'
 import ReceiveBeefTransactionRoute from '../../../dist/cjs/src/paymailRouter/paymailRoutes/receiveBeefTransaction.js'
 import PaymailClient from '../../../dist/cjs/src/paymailClient/paymailClient';
-import { PrivateKey, PublicKey, Signature, Transaction } from '@bsv/sdk';
+import { PrivateKey, Transaction } from '@bsv/sdk';
 
 describe('#Paymail Server - P2P Receive Beef Transaction', () => {
   let app
   let paymailClient;
 
   beforeAll(() => {
-    app = express()
-    const baseUrl = 'http://localhost:3000'
-    paymailClient = new PaymailClient()
+    app = express();
+    const baseUrl = 'http://localhost:3000';
+    paymailClient = new PaymailClient();
+  
     const routes = [
-      new ReceiveBeefTransactionRoute((name, domain, body) => {
-        return {
-          txid: '5878f6efcb1aa3be389510ae2ff10d0368976bf867e8442b751908f19024f8dd'
-        }
-      }, true, paymailClient)
-    ]
-    const paymailRouter = new PaymailRouter(baseUrl, routes)
-    app.use(paymailRouter.getRouter())
-  })
+      new ReceiveBeefTransactionRoute({
+        domainLogicHandler: (name, domain, body) => {
+          return {
+            txid: '5878f6efcb1aa3be389510ae2ff10d0368976bf867e8442b751908f19024f8dd'
+          };
+        },
+        verifySignature: true,
+        paymailClient: paymailClient
+      })
+    ];
+  
+    const paymailRouter = new PaymailRouter(baseUrl, routes);
+    app.use(paymailRouter.getRouter());
+  });
+  
 
   it('should reject with a 400 with invalid Beef transaction', async () => {
     const response = await request(app).post('/receive-beef-transaction/satoshi@bsv.org').send({
@@ -73,7 +80,7 @@ describe('#Paymail Server - P2P Receive Beef Transaction', () => {
       reference: 'someRefId'
     })
     expect(response.statusCode).toBe(400)
-    expect(response.error.text).toEqual('Invalid Signature')
+    expect(response.error.text).toEqual('Signature DER must start with 0x30')
   })
 
   it('should reject with invalid public key', async () => {

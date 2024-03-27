@@ -14,12 +14,17 @@ describe('#Paymail Server - P2P Receive Transaction', () => {
     const baseUrl = 'http://localhost:3000'
     paymailClient = new PaymailClient()
     const routes = [
-      new ReceiveTransactionRoute((name, domain, body) => {
-        return {
-          txid: '5878f6efcb1aa3be389510ae2ff10d0368976bf867e8442b751908f19024f8dd'
-        }
-      }, true, paymailClient)
-    ]
+      new ReceiveTransactionRoute({
+        domainLogicHandler: (name, domain, body) => {
+          return {
+            txid: '5878f6efcb1aa3be389510ae2ff10d0368976bf867e8442b751908f19024f8dd'
+          };
+        },
+        verifySignature: true,
+        paymailClient: paymailClient
+      })
+    ];
+    
     const paymailRouter = new PaymailRouter(baseUrl, routes)
     app.use(paymailRouter.getRouter())
   })
@@ -57,7 +62,7 @@ describe('#Paymail Server - P2P Receive Transaction', () => {
       reference: 'someRefId'
     })
     expect(response.statusCode).toBe(400)
-    expect(response.error.text).toEqual('Invalid Signature')
+    expect(response.error.text).toEqual('Signature DER must start with 0x30')
   })
 
   it('should reject with invalid public key', async () => {
