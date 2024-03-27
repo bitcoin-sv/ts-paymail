@@ -11,6 +11,6 @@ describe('#PaymailClient - Verify Public Key Owner', () => {
   it('should verify the public key owner', async () => {
     const paymail = 'brandonbryant@handcash.io'
     const result = await paymailClient.verifyPublicKey(paymail, 'random key')
-    console.log(result)
+    expect(result.match).toBe(false)
   })
 })
