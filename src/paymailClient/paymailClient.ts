@@ -4,7 +4,7 @@ import HttpClient from './httpClient.js'
 import Capability from '../capability/capability.js'
 import Joi from 'joi'
 import { PaymailServerResponseError } from '../errors/index.js'
-
+import { PrivateKey, Transaction } from '@bsv/sdk'
 import PublicProfileCapability from '../capability/publicProfileCapability.js'
 import PublicKeyInfrastructureCapability from '../capability/pkiCapability.js'
 import P2pPaymentDestinationCapability from '../capability/p2pPaymentDestinationCapability.js'
@@ -133,27 +133,31 @@ export default class PaymailClient {
     return response
   }
 
-  public sendTransactionP2P = async (paymail: string, txHex: string, reference: string, metadata?: {
+  public sendTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
     sender: string
     pubkey: string
     signature: string
     note: string
   }) => {
     const response = await this.request(paymail, ReceiveTransactionCapability, {
-      txHex,
+      hex,
       reference,
       metadata
     })
 
     const schema = Joi.object({
       txid: Joi.string().required(),
-      note: Joi.string()
+      note: Joi.string().optional().allow('')
     })
     const { error, value } = schema.validate(response)
     if (error) {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
     }
     return value
+  }
+
+  public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
+    return privKey.sign(txid).toString('hex') as string
   }
 
   public verifyPublicKey = async (paymail, pubkey) => {
@@ -176,21 +180,20 @@ export default class PaymailClient {
     return responseBody
   }
 
-  public sendBeefTransactionP2P = async (paymail: string, txHex: string, reference: string, metadata?: {
+  public sendBeefTransactionP2P = async (paymail: string, beef: string, reference: string, metadata?: {
     sender: string
     pubkey: string
     signature: string
     note: string
   }) => {
     const response = await this.request(paymail, ReceiveBeefTransactionCapability, {
-      txHex,
+      beef,
       reference,
       metadata
     })
-
     const schema = Joi.object({
       txid: Joi.string().required(),
-      note: Joi.string()
+      note: Joi.string().optional().allow('')
     })
     const { error, value } = schema.validate(response)
     if (error) {

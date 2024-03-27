@@ -30,7 +30,7 @@ export default class PaymailRoute {
       const { name, domain } = this.getNameAndDomainFromRequest(req)
       if (this.getBodyValidator()) {
         const validateBody = this.getBodyValidator()
-        validateBody(req.body)
+        await validateBody(req.body)
       }
       const response = await this.domainLogicHandler(name, domain, req.body)
       const serializedResponse = this.serializeResponse(response)
