@@ -1,54 +1,78 @@
 
-# Capability 
-A base definition for any new capability, contains information regarding the bfrc, HTTP Method, validating response body. Paymail Routes and Paymail Client take a base definition to extend the capabilities
+Links: [API](#api), [Classes](#classes)
 
-A handful of common capabilities have been implemented based on there specification
+# Classes
 
 ## Class: Capability
 
+Represents a capability in the BSV Paymail protocol.
+A capability is essentially a feature or service offered by a Paymail provider.
+
 ```ts
 export default class Capability {
-    constructor({ code, title, authors, version, supersedes, responseBodyValidator, method }: {
+    constructor({ code, title, authors, version, supersedes, method }: {
         code?: string;
         title: string;
         authors?: string[];
         version?: string;
         supersedes?: string[];
         method?: "GET" | "POST";
-        responseBodyValidator?: (body: any) => any;
     }) 
     public getCode(): string 
     public getMethod(): "GET" | "POST" 
-    public validateBody(body: any): any 
 }
 ```
 
+<details>
 
-### Example
+<summary>Class Capability Details</summary>
 
-#### Public Profile Implementation
+### Constructor
+
+Constructs a new Capability instance.
 
 ```ts
-import Joi from 'joi';
-import Capability from './capability.js';
-
-
-export default new Capability({
-    title: 'Public Profile (Name & Avatar)',
-    authors: ['Ryan X. Charles (Money Button)'],
-    version: '1',
-    responseBodyValidator: (body) => {
-      const schema = Joi.object({
-        name: Joi.string().required(),
-        avatar: Joi.string().uri().required()
-      });
-  
-      const { error, value } = schema.validate(body);
-      if (error) {
-        throw new Error(`Validation error: ${error.message}`);
-      }
-      return value;
-    },
-});
-
+constructor({ code, title, authors, version, supersedes, method }: {
+    code?: string;
+    title: string;
+    authors?: string[];
+    version?: string;
+    supersedes?: string[];
+    method?: "GET" | "POST";
+}) 
 ```
+
+Argument Details
+
++ **params**
+  + The parameters for the capability.
+
+### Method getCode
+
+Retrieves the code of the capability.
+
+```ts
+public getCode(): string 
+```
+
+Returns
+
+The capability code or a generated code if not explicitly set.
+
+### Method getMethod
+
+Retrieves the HTTP method of the capability.
+
+```ts
+public getMethod(): "GET" | "POST" 
+```
+
+Returns
+
+The HTTP method ('GET' or 'POST').
+
+</details>
+
+Links: [API](#api), [Classes](#classes)
+
+---

@@ -11,12 +11,20 @@ interface PaymailRouterConfig {
   requestSenderValidation?: boolean
 }
 
+/**
+ * PaymailRouter is responsible for routing and handling Paymail requests.
+ * It sets up the necessary routes and handlers based on the given configuration.
+ */
 export default class PaymailRouter {
-  private readonly router: Router
-  public baseUrl: string
-  public routes: PaymailRoute[]
-  public requestSenderValidation: boolean
+  private readonly router: Router;
+  public baseUrl: string;
+  public routes: PaymailRoute[];
+  public requestSenderValidation: boolean;
 
+  /**
+   * Creates an instance of PaymailRouter.
+   * @param config - Configuration options for the PaymailRouter.
+   */
   constructor (config: PaymailRouterConfig) {
     this.baseUrl = config.baseUrl
     this.router = express.Router()
@@ -44,6 +52,10 @@ export default class PaymailRouter {
     this.router.use(this.defaultErrorHandler())
   }
 
+    /**
+   * Default error handler for the PaymailRouter.
+   * @returns An express middleware for handling errors.
+   */
   private readonly defaultErrorHandler = () => {
     return (err, req, res, next) => {
       if (err instanceof PaymailBadRequestError) {
@@ -53,6 +65,9 @@ export default class PaymailRouter {
     }
   }
 
+    /**
+   * Adds a route for handling the well-known BSV alias protocol.
+   */
   private addWellKnownRouter (): void {
     this.router.get('/.well-known/bsvalias', (req, res) => {
       const capabilities = this.routes.reduce((map, route) => {
@@ -73,6 +88,10 @@ export default class PaymailRouter {
     return parts.map(part => part.replace(/(^\/+|\/+$)/g, '')).join('/')
   }
 
+    /**
+   * Gets the configured express Router.
+   * @returns The express Router with all configured routes and handlers.
+   */
   public getRouter (): Router {
     return this.router
   }

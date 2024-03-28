@@ -1,16 +1,73 @@
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes)
 
 # Interfaces
 
-## Overview
-`PaymailClient` is a class in the ts-paymail library that provides methods to interact with Paymail services. It encapsulates the functionality required for discovering capabilities, sending requests, and handling responses in accordance with Paymail standards.
+| |
+| --- |
+| [DNSResolverOptions](#interface-dnsresolveroptions) |
+| [DnsResponse](#interface-dnsresponse) |
 
-## Initialization
-To use `PaymailClient`, first create an instance by passing optional dependencies like an `HttpClient`, `DNSResolverOptions`, and a `localhostPort`.
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes)
 
+---
 
+## Interface: DnsResponse
+
+```ts
+export interface DnsResponse {
+    domain: string;
+    port: number;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes)
+
+---
+## Interface: DNSResolverOptions
+
+```ts
+export interface DNSResolverOptions {
+    dns?: any;
+    dohServerBaseUrl?: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes)
+
+---
+# Classes
+
+| |
+| --- |
+| [HttpClient](#class-httpclient) |
+| [PaymailClient](#class-paymailclient) |
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes)
+
+---
+
+## Class: HttpClient
+
+```ts
+export default class HttpClient {
+    constructor(fetch: Fetch, defaultTimeout = 30000) 
+    async request(url: string, options: (FetchOptions & {
+        method: "GET" | "POST";
+        body?: any;
+    }) = {
+        method: "GET"
+    }): Promise<Response> 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes)
+
+---
 ## Class: PaymailClient
+
+PaymailClient provides functionality to interact with BSV Paymail services.
+It offers methods to retrieve public profiles, verify public keys, send transactions, etc.
 
 ```ts
 export default class PaymailClient {
@@ -18,7 +75,7 @@ export default class PaymailClient {
     public ensureCapabilityFor = async (aDomain, aCapability) => {
         const capabilities = await this.getDomainCapabilities(aDomain);
         if (!capabilities[aCapability]) {
-            throw new Error(`Domain "${aDomain}" does not support capability "${aCapability}"`);
+            throw new PaymailServerResponseError(`Domain "${aDomain}" does not support capability "${aCapability}"`);
         }
         return capabilities[aCapability];
     };
@@ -28,32 +85,335 @@ export default class PaymailClient {
         const requestUrl = url.replace("{alias}", name).replace("{domain.tld}", domain);
         const response = await this.httpClient.request(requestUrl, {
             method: capability.getMethod(),
-            body,
+            body
         });
         const responseBody = await response.json();
-        return capability.validateBody(responseBody);
+        return responseBody;
     };
     public getPublicProfile = async (paymail) => {
-        return this.request(paymail, PublicProfileCapability);
+        const response = await this.request(paymail, PublicProfileCapability);
+        const schema = Joi.object({
+            name: Joi.string().required(),
+            avatar: Joi.string().uri().required()
+        });
+        const { error, value } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        return value;
+    };
+    public getPki = async (paymail) => {
+        const response = await this.request(paymail, PublicKeyInfrastructureCapability);
+        const schema = Joi.object({
+            bsvalias: Joi.string().optional().allow("1.0"),
+            handle: Joi.string().required(),
+            pubkey: Joi.string().required()
+        });
+        const { error, value } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        return value;
+    };
+    public getP2pPaymentDestination = async (paymail: string, satoshis: number): Promise<any> => {
+        const response = await this.request(paymail, P2pPaymentDestinationCapability, {
+            satoshis
+        });
+        const schema = Joi.object({
+            outputs: Joi.array().items(Joi.object({
+                script: Joi.string().required(),
+                satoshis: Joi.number().required()
+            }).required().min(1)),
+            reference: Joi.string().required()
+        });
+        const { error } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        if (satoshis !== response.outputs.reduce((acc, output) => acc + output.satoshis, 0)) {
+            throw new PaymailServerResponseError("The server did not return the expected amount of satoshis");
+        }
+        return response;
+    };
+    public sendTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
+        sender: string;
+        pubkey: string;
+        signature: string;
+        note: string;
+    }) => {
+        const response = await this.request(paymail, ReceiveTransactionCapability, {
+            hex,
+            reference,
+            metadata
+        });
+        const schema = Joi.object({
+            txid: Joi.string().required(),
+            note: Joi.string().optional().allow("")
+        });
+        const { error, value } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        return value;
+    };
+    public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
+        return privKey.sign(txid).toString("hex") as string;
+    };
+    public verifyPublicKey = async (paymail, pubkey) => {
+        const [name, domain] = paymail.split("@");
+        const url = await this.ensureCapabilityFor(domain, VerifyPublicKeyOwnerCapability.getCode());
+        const requestUrl = url.replace("{alias}", name).replace("{domain.tld}", domain).replace("{pubkey}", pubkey);
+        const response = await this.httpClient.request(requestUrl);
+        const responseBody = await response.json();
+        const schema = Joi.object({
+            bsvalias: Joi.string().optional().allow("1.0"),
+            handle: Joi.string().required(),
+            pubkey: Joi.string().required(),
+            match: Joi.boolean().required()
+        });
+        const { error } = schema.validate(responseBody);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        return responseBody;
+    };
+    public sendBeefTransactionP2P = async (paymail: string, beef: string, reference: string, metadata?: {
+        sender: string;
+        pubkey: string;
+        signature: string;
+        note: string;
+    }) => {
+        const response = await this.request(paymail, ReceiveBeefTransactionCapability, {
+            beef,
+            reference,
+            metadata
+        });
+        const schema = Joi.object({
+            txid: Joi.string().required(),
+            note: Joi.string().optional().allow("")
+        });
+        const { error, value } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        return value;
     };
 }
 ```
 
-## Methods
+<details>
 
-### `request`
-Sends a request to a Paymail server based on the provided capability and handles the response.
+<summary>Class PaymailClient Details</summary>
 
-To extend the paymail client to new capabilities you can leverage the request method to handle some of the boilerplate logic
+### Constructor
 
-- **Parameters:**
-  - `aDomain`: The domain to send the request to.
-  - `capability`: The `Capability` object representing the capability to use.
-  - `body`: (Optional) The request body to send.
+Constructs a new PaymailClient.
 
-- **Returns:** The validated response body.
-
-- **Usage:**
 ```ts
-  const response = await paymailClient.request('satoshi@example.com', someCapability, requestBody);
+constructor(httpClient?: HttpClient, dnsOptions?: DNSResolverOptions, localhostPort?: number) 
 ```
+
+Argument Details
+
++ **httpClient**
+  + HTTP client for making network requests. If not provided, a default HttpClient is used.
++ **dnsOptions**
+  + Configuration options for DNS resolution.
++ **localhostPort**
+  + The port number for localhost development. Defaults to 3000 if not specified.
+
+### Property createP2PSignature
+
+Creates a digital signature for a P2P transaction using a given private key.
+
+```ts
+public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
+    return privKey.sign(txid).toString("hex") as string;
+}
+```
+
+### Property ensureCapabilityFor
+
+Ensures that a specified domain supports a given capability.
+
+```ts
+public ensureCapabilityFor = async (aDomain, aCapability) => {
+    const capabilities = await this.getDomainCapabilities(aDomain);
+    if (!capabilities[aCapability]) {
+        throw new PaymailServerResponseError(`Domain "${aDomain}" does not support capability "${aCapability}"`);
+    }
+    return capabilities[aCapability];
+}
+```
+
+### Property getP2pPaymentDestination
+
+Requests a P2P payment destination for a given Paymail.
+
+```ts
+public getP2pPaymentDestination = async (paymail: string, satoshis: number): Promise<any> => {
+    const response = await this.request(paymail, P2pPaymentDestinationCapability, {
+        satoshis
+    });
+    const schema = Joi.object({
+        outputs: Joi.array().items(Joi.object({
+            script: Joi.string().required(),
+            satoshis: Joi.number().required()
+        }).required().min(1)),
+        reference: Joi.string().required()
+    });
+    const { error } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    if (satoshis !== response.outputs.reduce((acc, output) => acc + output.satoshis, 0)) {
+        throw new PaymailServerResponseError("The server did not return the expected amount of satoshis");
+    }
+    return response;
+}
+```
+
+### Property getPki
+
+Retrieves the public key infrastructure (PKI) data for a given Paymail address.
+
+```ts
+public getPki = async (paymail) => {
+    const response = await this.request(paymail, PublicKeyInfrastructureCapability);
+    const schema = Joi.object({
+        bsvalias: Joi.string().optional().allow("1.0"),
+        handle: Joi.string().required(),
+        pubkey: Joi.string().required()
+    });
+    const { error, value } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return value;
+}
+```
+
+### Property getPublicProfile
+
+Retrieves the public profile associated with a Paymail address.
+
+```ts
+public getPublicProfile = async (paymail) => {
+    const response = await this.request(paymail, PublicProfileCapability);
+    const schema = Joi.object({
+        name: Joi.string().required(),
+        avatar: Joi.string().uri().required()
+    });
+    const { error, value } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return value;
+}
+```
+
+### Property request
+
+Makes a generic request to a Paymail service.
+
+```ts
+public request = async (aDomain: string, capability: Capability, body?: any) => {
+    const [name, domain] = aDomain.split("@");
+    const url = await this.ensureCapabilityFor(domain, capability.getCode());
+    const requestUrl = url.replace("{alias}", name).replace("{domain.tld}", domain);
+    const response = await this.httpClient.request(requestUrl, {
+        method: capability.getMethod(),
+        body
+    });
+    const responseBody = await response.json();
+    return responseBody;
+}
+```
+
+### Property sendBeefTransactionP2P
+
+Sends a beef transaction using the Pay-to-Peer (P2P) protocol.
+
+```ts
+public sendBeefTransactionP2P = async (paymail: string, beef: string, reference: string, metadata?: {
+    sender: string;
+    pubkey: string;
+    signature: string;
+    note: string;
+}) => {
+    const response = await this.request(paymail, ReceiveBeefTransactionCapability, {
+        beef,
+        reference,
+        metadata
+    });
+    const schema = Joi.object({
+        txid: Joi.string().required(),
+        note: Joi.string().optional().allow("")
+    });
+    const { error, value } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return value;
+}
+```
+
+### Property sendTransactionP2P
+
+Sends a transaction using the Pay-to-Peer (P2P) protocol.
+This method is used to send a transaction to a Paymail address.
+
+```ts
+public sendTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
+    sender: string;
+    pubkey: string;
+    signature: string;
+    note: string;
+}) => {
+    const response = await this.request(paymail, ReceiveTransactionCapability, {
+        hex,
+        reference,
+        metadata
+    });
+    const schema = Joi.object({
+        txid: Joi.string().required(),
+        note: Joi.string().optional().allow("")
+    });
+    const { error, value } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return value;
+}
+```
+
+### Property verifyPublicKey
+
+Verifies the ownership of a public key for a given Paymail address.
+
+```ts
+public verifyPublicKey = async (paymail, pubkey) => {
+    const [name, domain] = paymail.split("@");
+    const url = await this.ensureCapabilityFor(domain, VerifyPublicKeyOwnerCapability.getCode());
+    const requestUrl = url.replace("{alias}", name).replace("{domain.tld}", domain).replace("{pubkey}", pubkey);
+    const response = await this.httpClient.request(requestUrl);
+    const responseBody = await response.json();
+    const schema = Joi.object({
+        bsvalias: Joi.string().optional().allow("1.0"),
+        handle: Joi.string().required(),
+        pubkey: Joi.string().required(),
+        match: Joi.boolean().required()
+    });
+    const { error } = schema.validate(responseBody);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return responseBody;
+}
+```
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes)
+
+---

@@ -4,7 +4,7 @@ import HttpClient from './httpClient.js'
 import Capability from '../capability/capability.js'
 import Joi from 'joi'
 import { PaymailServerResponseError } from '../errors/index.js'
-import { PrivateKey, Transaction } from '@bsv/sdk'
+import { PrivateKey } from '@bsv/sdk'
 import PublicProfileCapability from '../capability/publicProfileCapability.js'
 import PublicKeyInfrastructureCapability from '../capability/pkiCapability.js'
 import P2pPaymentDestinationCapability from '../capability/p2pPaymentDestinationCapability.js'
@@ -12,12 +12,29 @@ import ReceiveTransactionCapability from '../capability/p2pReceiveTransactionCap
 import VerifyPublicKeyOwnerCapability from '../capability/verifyPublicKeyOwnerCapability.js'
 import ReceiveBeefTransactionCapability from '../capability/p2pReceiveBeefTransactionCapability.js'
 
+/**
+ * PaymailClient provides functionality to interact with BSV Paymail services.
+ * It offers methods to retrieve public profiles, verify public keys, send transactions, etc.
+ */
 export default class PaymailClient {
+  // Cache for storing domain capabilities.
   private readonly _domainCapabilityCache: Map<string, Map<string, any>>
+
+  // Resolver for handling DNS queries.
   private readonly _resolver: AbstractResolver
+
+  // Local port for development purposes. Defaults to 3000.
   private readonly _localHostPort: number
+
+  // HTTP client for making network requests.
   private readonly httpClient: HttpClient
 
+  /**
+   * Constructs a new PaymailClient.
+   * @param httpClient - HTTP client for making network requests. If not provided, a default HttpClient is used.
+   * @param dnsOptions - Configuration options for DNS resolution.
+   * @param localhostPort - The port number for localhost development. Defaults to 3000 if not specified.
+   */
   constructor (httpClient?: HttpClient, dnsOptions?: DNSResolverOptions, localhostPort?: number) {
     this.httpClient = httpClient || new HttpClient(fetch)
     this._domainCapabilityCache = new Map()
@@ -25,7 +42,12 @@ export default class PaymailClient {
     this._localHostPort = localhostPort || 3000
   }
 
-  private readonly fetchWellKnown = async (aDomain) => {
+  /**
+   * Fetches the well-known configuration for a Paymail domain.
+   * @param aDomain - The domain to fetch the configuration for.
+   * @returns The well-known configuration as a JSON object.
+   */
+  private readonly fetchWellKnown = async (aDomain: string): Promise<any> => {
     const isLocalHost = this.isDomainLocalHost(aDomain)
     const protocol = isLocalHost ? 'http://' : 'https://'
     let domain = aDomain
@@ -61,6 +83,13 @@ export default class PaymailClient {
     return this._domainCapabilityCache.get(aDomain)
   }
 
+  /**
+ * Ensures that a specified domain supports a given capability.
+ * @param aDomain - The domain to check for the capability.
+ * @param aCapability - The capability to check for.
+ * @returns The URL endpoint for the specified capability.
+ * @throws PaymailServerResponseError - Thrown if the domain does not support the requested capability.
+ */
   public ensureCapabilityFor = async (aDomain, aCapability) => {
     const capabilities = await this.getDomainCapabilities(aDomain)
     if (!capabilities[aCapability]) {
@@ -69,6 +98,13 @@ export default class PaymailClient {
     return capabilities[aCapability]
   }
 
+  /**
+ * Makes a generic request to a Paymail service.
+ * @param aDomain - The domain of the Paymail service.
+ * @param capability - The capability being requested.
+ * @param body - Optional request body.
+ * @returns The response from the Paymail service.
+ */
   public request = async (aDomain: string, capability: Capability, body?: any) => {
     const [name, domain] = aDomain.split('@')
     const url = await this.ensureCapabilityFor(domain, capability.getCode())
@@ -81,6 +117,12 @@ export default class PaymailClient {
     return responseBody
   }
 
+  /**
+ * Retrieves the public profile associated with a Paymail address.
+ * @param paymail - The Paymail address to fetch the profile for.
+ * @returns The public profile including name and avatar.
+ * @throws PaymailServerResponseError - Thrown if there is a validation error in the response.
+ */
   public getPublicProfile = async (paymail) => {
     const response = await this.request(paymail, PublicProfileCapability)
     const schema = Joi.object({
@@ -95,6 +137,12 @@ export default class PaymailClient {
     return value
   }
 
+  /**
+ * Retrieves the public key infrastructure (PKI) data for a given Paymail address.
+ * @param paymail - The Paymail address to fetch the PKI data for.
+ * @returns PKI data including bsvalias, handle, and pubkey.
+ * @throws PaymailServerResponseError - Thrown if there is a validation error in the response.
+ */
   public getPki = async (paymail) => {
     const response = await this.request(paymail, PublicKeyInfrastructureCapability)
     const schema = Joi.object({
@@ -109,7 +157,13 @@ export default class PaymailClient {
     return value
   }
 
-  public getP2pPaymentDestination = async (paymail, satoshis: number) => {
+  /**
+   * Requests a P2P payment destination for a given Paymail.
+   * @param paymail - The Paymail address to request the payment destination for.
+   * @param satoshis - The amount of satoshis for the transaction.
+   * @returns An object containing the payment destination details.
+   */
+  public getP2pPaymentDestination = async (paymail: string, satoshis: number): Promise<any> => {
     const response = await this.request(paymail, P2pPaymentDestinationCapability, {
       satoshis
     })
@@ -133,6 +187,17 @@ export default class PaymailClient {
     return response
   }
 
+  /**
+ * Sends a transaction using the Pay-to-Peer (P2P) protocol.
+ * This method is used to send a transaction to a Paymail address.
+ *
+ * @param paymail - The Paymail address to send the transaction to.
+ * @param hex - The transaction in hexadecimal format.
+ * @param reference - A reference identifier for the transaction.
+ * @param metadata - Optional metadata for the transaction including sender, public key, signature, and note.
+ * @returns A Promise that resolves to an object containing the transaction ID and an optional note.
+ * @throws PaymailServerResponseError - Thrown if there is a validation error in the response.
+ */
   public sendTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
     sender: string
     pubkey: string
@@ -156,10 +221,23 @@ export default class PaymailClient {
     return value
   }
 
+  /**
+   * Creates a digital signature for a P2P transaction using a given private key.
+   * @param txid - The transaction ID to be signed.
+   * @param privKey - The private key used for signing the transaction.
+   * @returns A hex string representing the digital signature.
+   */
   public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
     return privKey.sign(txid).toString('hex') as string
   }
 
+  /**
+   * Verifies the ownership of a public key for a given Paymail address.
+   * @param paymail - The Paymail address to verify the public key for.
+   * @param pubkey - The public key to verify.
+   * @returns An object containing verification results.
+   * @throws PaymailServerResponseError - Thrown if there is an error in the verification process.
+   */
   public verifyPublicKey = async (paymail, pubkey) => {
     const [name, domain] = paymail.split('@')
     const url = await this.ensureCapabilityFor(domain, VerifyPublicKeyOwnerCapability.getCode())
@@ -180,6 +258,15 @@ export default class PaymailClient {
     return responseBody
   }
 
+  /**
+ * Sends a beef transaction using the Pay-to-Peer (P2P) protocol.
+ * @param paymail - The Paymail address to which the transaction is sent.
+ * @param beef - The transaction content in beef format.
+ * @param reference - A reference identifier for the transaction.
+ * @param metadata - Optional metadata including sender, public key, signature, and a note.
+ * @returns The transaction ID and an optional note in the response.
+ * @throws PaymailServerResponseError - Thrown if there is a validation error in the response.
+ */
   public sendBeefTransactionP2P = async (paymail: string, beef: string, reference: string, metadata?: {
     sender: string
     pubkey: string

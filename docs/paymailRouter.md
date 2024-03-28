@@ -1,64 +1,25 @@
 
-Links: [API](#api), [Classes](#classes)
+Links: [API](#api), [Classes](#classes), [Types](#types)
 
 # Classes
 
 | |
 | --- |
-| [P2pPaymentDestinationRoute](#class-p2ppaymentdestinationroute) |
 | [PaymailRoute](#class-paymailroute) |
 | [PaymailRouter](#class-paymailrouter) |
-| [PublicKeyInfrastructureRoute](#class-publickeyinfrastructureroute) |
-| [ReceiveTransactionRoute](#class-receivetransactionroute) |
-| [VerifyPublicKeyOwnerRoute](#class-verifypublickeyownerroute) |
 
-Links: [API](#api), [Classes](#classes)
-
----
-
-## Class: PaymailRouter
-
-Base Paymail Router to be added to your express application
-
-```ts
-export default class PaymailRouter {
-    public baseUrl: string;
-    public routes: Route[];
-    public requestSenderValidation: boolean;
-    constructor(baseUrl: string, routes: PaymailRoute[], errorHandler?: ErrorRequestHandler, requestSenderValidation?: boolean) 
-    public getRouter(): Router 
-}
-```
-
-### Usage
-
-```ts
-import express from 'express';
-import PaymailRouter from '../src/router/router.js';
-const app = express();
-const baseUrl = 'http://localhost:3000';
-const routes = [];
-const paymailRouter = new PaymailRouter({ baseUrl, routes });
-app.use(paymailRouter.getRouter());
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-```
-
-Links: [API](#api), [Classes](#classes)
+Links: [API](#api), [Classes](#classes), [Types](#types)
 
 ---
 
 ## Class: PaymailRoute
 
-Each Capability will extend the paymail with a new route
-
 ```ts
 export default class PaymailRoute {
-    constructor(private capability: Capability, private endpoint: string, private domainLogicHandler: RequestHandler, protected bodyValidator?: (body: any) => any) 
+    protected readonly domainLogicHandler: DomainLogicHandler;
+    constructor(config: PaymailRouteConfig) 
     protected async defaultHandler(req: Request, res: Response, next: NextFunction): Promise<any> 
+    protected async validateBody(body: any): Promise<void> 
     protected serializeResponse(response): string 
     protected sendSuccessResponse(res: Response, content: string): Response 
     public getHandler(): RequestHandler 
@@ -68,55 +29,66 @@ export default class PaymailRoute {
 }
 ```
 
-Links: [API](#api), [Classes](#classes)
+Links: [API](#api), [Classes](#classes), [Types](#types)
 
 ---
-## Class: P2pPaymentDestinationRoute
+## Class: PaymailRouter
+
+PaymailRouter is responsible for routing and handling Paymail requests.
+It sets up the necessary routes and handlers based on the given configuration.
 
 ```ts
-export default class P2pPaymentDestinationRoute extends PaymailRoute {
-    constructor(domainLogicHandler: RequestHandler, endpoint = "/p2p-payment-destination/:paymail") 
-    protected serializeResponse(domainLogicResponse: P2pDestinationsResponse): string 
+export default class PaymailRouter {
+    public baseUrl: string;
+    public routes: PaymailRoute[];
+    public requestSenderValidation: boolean;
+    constructor(config: PaymailRouterConfig) 
+    public getRouter(): Router 
 }
 ```
 
-Links: [API](#api), [Classes](#classes)
+<details>
 
----
-## Class: PublicKeyInfrastructureRoute
+<summary>Class PaymailRouter Details</summary>
 
-```ts
-export default class PublicKeyInfrastructureRoute extends PaymailRoute {
-    constructor(domainLogicHandler: RequestHandler, endpoint = "/id/:paymail") 
-    protected serializeResponse(domainLogicResponse: PkiResponse): string 
-}
-```
+### Constructor
 
-Links: [API](#api), [Classes](#classes)
-
----
-## Class: ReceiveTransactionRoute
+Creates an instance of PaymailRouter.
 
 ```ts
-export default class ReceiveTransactionRoute extends PaymailRoute {
-    constructor(domainLogicHandler: RequestHandler, endpoint = "/receive-transaction/:paymail") 
-    ReceiveTransactionResponse;
-    protected serializeResponse(domainLogicResponse: ReceiveTransactionResponse): string 
-}
+constructor(config: PaymailRouterConfig) 
 ```
 
-Links: [API](#api), [Classes](#classes)
+Argument Details
 
----
-## Class: VerifyPublicKeyOwnerRoute
++ **config**
+  + Configuration options for the PaymailRouter.
+
+### Method getRouter
+
+Gets the configured express Router.
 
 ```ts
-export default class VerifyPublicKeyOwnerRoute extends PaymailRoute {
-    constructor(domainLogicHandler: RequestHandler, endpoint = "/verifypubkey/:paymail/:pubkey") 
-    protected serializeResponse(domainLogicResponse: VerifyPublicKeyOwnerResponse): string 
-}
+public getRouter(): Router 
 ```
 
-Links: [API](#api), [Classes](#classes)
+Returns
+
+The express Router with all configured routes and handlers.
+
+</details>
+
+Links: [API](#api), [Classes](#classes), [Types](#types)
+
+---
+# Types
+
+## Type: DomainLogicHandler
+
+```ts
+export type DomainLogicHandler = (name: string, domain: string, body?: any) => Promise<any>
+```
+
+Links: [API](#api), [Classes](#classes), [Types](#types)
 
 ---

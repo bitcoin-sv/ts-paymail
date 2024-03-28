@@ -73,7 +73,8 @@
     "build": "tsc -b && tsconfig-to-dual-package tsconfig.cjs.json",
     "dev": "tsc -b -w",
     "prepublish": "npm run build",
-    "doc": "ts2md --inputFilename=src/capability/index.ts --outputFilename=docs/capability.md --filenameSubString=capability --firstHeadingLevel=1 && ts2md --inputFilename=src/client/index.ts --outputFilename=docs/paymailClient.md --filenameSubString=paymailClient --firstHeadingLevel=1 && npx ts2md --inputFilename=src/router/index.ts --outputFilename=docs/paymailRouter.md --filenameSubString=router --firstHeadingLevel=1"
+    "build:examples": "tsc -p tsconfig.examples.json",
+    "doc": "ts2md --inputFilename=src/capability/index.ts --outputFilename=docs/capability.md --filenameSubString=capability --firstHeadingLevel=1 && ts2md --inputFilename=src/paymailClient/paymailClient.ts --outputFilename=docs/paymailClient.md --filenameSubString=paymailClient --firstHeadingLevel=1 && npx ts2md --inputFilename=src/paymailRouter/paymailRouter.ts --outputFilename=docs/paymailRouter.md --filenameSubString=paymailRouter --firstHeadingLevel=1"
   },
   "author": "BSV Blockchain Association",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -113,6 +114,7 @@
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "jwt-simple": "^0.5.6",
     "ts-standard": "^12.0.2"
   }
 }
