@@ -1,4 +1,5 @@
-import { PublicKeyInfrastructureRoute } from '../../../src/paymailRouter/index.js'
+import { PublicKeyInfrastructureRoute } from '../../../../dist/cjs/src/paymailRouter/index.js';
+
 import { fetchUser } from '../mockUser.js'
 
 const pkiRoute = new PublicKeyInfrastructureRoute({

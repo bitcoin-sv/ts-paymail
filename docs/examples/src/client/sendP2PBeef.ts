@@ -1,5 +1,5 @@
-import { PaymailClient } from '../../../src/paymailClient/index.js';
-import { mockUser1, mockUser2 } from '../mockUser'
+import { PaymailClient } from '../../../../dist/cjs/src/paymailClient/index.js';
+import { mockUser1, mockUser2 } from '../mockUser.js'
 
 const client = new PaymailClient();
 
@@ -14,11 +14,10 @@ const client = new PaymailClient();
   // example we are assuming only one output but in reality it can be many
   const { tx, reference } = await sender.getSpendingTransactionToScript(p2pDestination.outputs[0].script, 10)
 
-  await client.sendTransactionP2P(receiver.getPaymail(), tx.toHex(), p2pDestination.reference,
+  await client.sendBeefTransactionP2P(receiver.getPaymail(), tx.toHexBEEF(), p2pDestination.reference,
     {
       sender: sender.getPaymail(),
       pubkey: sender.getIdentityKey(),
-      // @ts-expect-error
       signature: client.createP2PSignature(tx.id('hex') as string, sender.getIdentityPrivateKey()),
       note: 'hello world'
     })

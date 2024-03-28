@@ -1,5 +1,5 @@
-import { PaymailClient } from '../../src/paymailClient/index.js'
-import { mockUser1, mockUser2 } from './mockUser'
+import { PaymailClient } from '../../../dist/cjs/src/paymailClient/index.js';
+import { mockUser1, mockUser2 } from './mockUser.js'
 
 const client = new PaymailClient();
 

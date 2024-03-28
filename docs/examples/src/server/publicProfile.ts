@@ -1,4 +1,4 @@
-import { PublicProfileRoute } from '../../../src/paymailRouter/index.js'
+import { PublicProfileRoute } from '../../../../dist/cjs/src/paymailRouter/index.js';
 import { fetchUser } from '../mockUser.js';
 
 const publicProfileRoute = new PublicProfileRoute({

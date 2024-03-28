@@ -6,7 +6,6 @@
   },
   "include": [
     "./src/**/*.ts",
-    "./examples/**/*.ts",
     ".eslintrc.js",
     "jest.config.js",
   ]

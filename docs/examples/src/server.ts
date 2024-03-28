@@ -1,5 +1,5 @@
 import express from 'express'
-import { PaymailRouter } from '../../src/paymailRouter/index.js'
+import { PaymailRouter } from '../../../dist/cjs/src/paymailRouter/index.js';
 import publicProfileRoute from './server/publicProfile.js'
 import pkiRoute from './server/pki.js'
 import p2pDestinationsRoute from './server/p2pDestinations.js'
