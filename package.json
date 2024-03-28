@@ -47,10 +47,20 @@
       "require": "./dist/cjs/src/paymailRouter/index.js",
       "types": "./dist/types/src/paymailRouter/index.d.ts"
     },
-    "./transaction/*": {
+    "./paymailRouter/*": {
       "import": "./dist/esm/src/paymailRouter/*.js",
       "require": "./dist/cjs/src/paymailRouter/*.js",
       "types": "./dist/types/src/paymailRouter/*.d.ts"
+    },
+    "./errors": {
+      "import": "./dist/esm/src/errors/index.js",
+      "require": "./dist/cjs/src/errors/index.js",
+      "types": "./dist/types/src/errors/index.d.ts"
+    },
+    "./errors/*": {
+      "import": "./dist/esm/src/errors/*.js",
+      "require": "./dist/cjs/src/errors/*.js",
+      "types": "./dist/types/src/errors/*.d.ts"
     }
   },
   "scripts": {
