@@ -38,7 +38,7 @@ import PaymailRouter from '../src/router/router.js';
 const app = express();
 const baseUrl = 'http://localhost:3000';
 const routes = [];
-const paymailRouter = new PaymailRouter(baseUrl, routes);
+const paymailRouter = new PaymailRouter({ baseUrl, routes });
 app.use(paymailRouter.getRouter());
 const PORT = 3000;
 app.listen(PORT, () => {

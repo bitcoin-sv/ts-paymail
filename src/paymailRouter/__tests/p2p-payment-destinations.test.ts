@@ -9,24 +9,27 @@ describe('#Paymail Server - P2P Payment Destinations', () => {
   let client: PaymailClient
 
   beforeAll(() => {
-    app = express()
-    const baseUrl = 'http://localhost:3000'
+    app = express();
+    const baseUrl = 'http://localhost:3000';
+    client = new PaymailClient(); // Assuming the client is needed for route config
     const routes = [
-      new P2pPaymentDestinationRoute((name, domain, body) => {
-        return {
-          outputs: [
-            {
-              script: '76a914f32281faa74e2ac037493f7a3cd317e8f5e9673688ac',
-              satoshis: body.satoshis
-            }
-          ],
-          reference: 'someref'
+      new P2pPaymentDestinationRoute({
+        domainLogicHandler: (name, domain, body) => {
+          return {
+            outputs: [
+              {
+                script: '76a914f32281faa74e2ac037493f7a3cd317e8f5e9673688ac',
+                satoshis: body.satoshis
+              }
+            ],
+            reference: 'someref'
+          };
         }
       })
-    ]
-    const paymailRouter = new PaymailRouter(baseUrl, routes)
-    app.use(paymailRouter.getRouter())
-  })
+    ];
+    const paymailRouter = new PaymailRouter({ baseUrl, routes });
+    app.use(paymailRouter.getRouter());
+  });
 
   it('should get public profile for user paymail', async () => {
     const response = await request(app).post('/p2p-payment-destination/satoshi@bsv.org').send({

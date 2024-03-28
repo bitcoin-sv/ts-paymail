@@ -7,16 +7,29 @@ describe('#Paymail Server - Capability discovery', () => {
   let app
 
   beforeAll(() => {
-    app = express()
-    const baseUrl = 'http://localhost:3000'
-    const capabilities = [
-      new PublicProfileRoute((name, domain) => {
-        return { name, domain, avatarUrl: `https://avatar.com/${name}@${domain}` }
+    app = express();
+    const baseUrl = 'http://localhost:3000';
+  
+    const routes = [
+      new PublicProfileRoute({
+        domainLogicHandler: (name, domain) => {
+          return {
+            name: name,
+            domain: domain,
+            avatar: `https://avatar.com/${name}@${domain}`
+          };
+        }
       })
-    ]
-    const paymailRouter = new PaymailRouter(baseUrl, capabilities, undefined, true)
-    app.use(paymailRouter.getRouter())
-  })
+    ];
+  
+    const paymailRouter = new PaymailRouter({
+      baseUrl,
+      routes,
+      requestSenderValidation: true,
+    });
+    app.use(paymailRouter.getRouter());
+  });
+  
 
   it('should get capabilities', async () => {
     const response = await request(app).get('/.well-known/bsvalias')

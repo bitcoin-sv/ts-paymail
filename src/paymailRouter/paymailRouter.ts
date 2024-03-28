@@ -4,20 +4,27 @@ import PaymailRoute from './paymailRoutes/paymailRoute.js'
 import RequestSenderValidationCapability from '../capability/requestSenderValidationCapability.js'
 import { PaymailBadRequestError } from '../errors/index.js'
 
+interface PaymailRouterConfig {
+  baseUrl: string
+  routes: PaymailRoute[]
+  errorHandler?: ErrorRequestHandler
+  requestSenderValidation?: boolean
+}
+
 export default class PaymailRouter {
   private readonly router: Router
   public baseUrl: string
   public routes: PaymailRoute[]
   public requestSenderValidation: boolean
 
-  constructor (baseUrl: string, routes: PaymailRoute[], errorHandler?: ErrorRequestHandler, requestSenderValidation?: boolean) {
-    this.baseUrl = baseUrl
+  constructor (config: PaymailRouterConfig) {
+    this.baseUrl = config.baseUrl
     this.router = express.Router()
     this.router.use(bodyParser.json({ type: 'application/json' }))
-    this.routes = routes
-    this.requestSenderValidation = requestSenderValidation
+    this.routes = config.routes
+    this.requestSenderValidation = config.requestSenderValidation ?? false
 
-    routes.forEach(route => {
+    this.routes.forEach(route => {
       const method = route.getMethod()
       if (method === 'GET') {
         this.router.get(route.getEndpoint(), route.getHandler())
@@ -27,10 +34,13 @@ export default class PaymailRouter {
         throw new PaymailBadRequestError('Unsupported method: ' + method)
       }
     })
+
     this.addWellKnownRouter()
-    if (errorHandler) {
-      this.router.use(errorHandler)
+
+    if (config.errorHandler) {
+      this.router.use(config.errorHandler)
     }
+
     this.router.use(this.defaultErrorHandler())
   }
 

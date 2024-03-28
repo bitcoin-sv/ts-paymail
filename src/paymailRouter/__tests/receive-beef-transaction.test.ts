@@ -16,7 +16,7 @@ describe('#Paymail Server - P2P Receive Beef Transaction', () => {
   
     const routes = [
       new ReceiveBeefTransactionRoute({
-        domainLogicHandler: (name, domain, body) => {
+        domainLogicHandler: () => {
           return {
             txid: '5878f6efcb1aa3be389510ae2ff10d0368976bf867e8442b751908f19024f8dd'
           };
@@ -26,9 +26,10 @@ describe('#Paymail Server - P2P Receive Beef Transaction', () => {
       })
     ];
   
-    const paymailRouter = new PaymailRouter(baseUrl, routes);
+    const paymailRouter = new PaymailRouter({ baseUrl, routes });
     app.use(paymailRouter.getRouter());
   });
+  
   
 
   it('should reject with a 400 with invalid Beef transaction', async () => {
