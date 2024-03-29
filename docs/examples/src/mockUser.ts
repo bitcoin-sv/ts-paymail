@@ -152,7 +152,7 @@ class MockUser {
   };
 
   async broadcastTransaction (tx: Transaction) {
-    const result = await tx.broadcast(new ARC('https://api.taal.com/arc', 'mainnet_b1cb84c784c8e835dbc13c18d74077f3'))
+    const result = await tx.broadcast(new ARC('https://api.taal.com/arc', 'mainnet_06770f425eb00298839a24a49cbdc02c'))
   };
 
   // Clean user wallet by consolidating outputs
