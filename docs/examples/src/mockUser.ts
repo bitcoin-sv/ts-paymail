@@ -96,11 +96,12 @@ class MockUser {
     const { changeOutput, changeIndex } = this.getChangeOutput()
     const outputs = []
     const inputs = []
-    outputs.push({
+    const tx = new Transaction()
+    tx.addOutput({
       lockingScript: LockingScript.fromHex(lockingScript),
       satoshis: amount
     })
-    outputs.push(changeOutput)
+    tx.addOutput(changeOutput);
     const usedOutputReferences = []
 
     for (const output of this.availableOutputs) {
@@ -112,10 +113,11 @@ class MockUser {
         throw new Error('Source transaction not found')
       }
       const sourceOutput = sourceTx.outputs[output.sourceOutputIndex]
-      inputs.push({
+      tx.addInput({
         sourceTransaction: sourceTx,
         sourceOutputIndex: output.sourceOutputIndex,
         unlockingScriptTemplate: output.unlockingScriptTemplate,
+        sequence: 0xFFFFFFFF
       })
       usedOutputReferences.push(`${output.sourceTransactionId}:${output.sourceOutputIndex}`)
       targetAmount -= sourceOutput.satoshis
@@ -123,7 +125,6 @@ class MockUser {
     if (targetAmount > 0) {
       throw new Error('Insufficient funds send money to wallet ' +  this.getPrivateKeyFromReference('start-0').toAddress().toString())
     }
-    const tx = new Transaction(1, inputs, outputs)
     await tx.fee()
     await tx.sign()
 
@@ -157,11 +158,10 @@ class MockUser {
   // Clean user wallet by consolidating outputs
   // For demonstration purposes only we will send to same path every time to make init easier
   async consolidateOutputs () {
-    if (this.availableOutputs.length === 0) return
-    const initPrivateKey = this.getPrivateKeyFromReference('start-0')
+    const privateKey = this.getPrivateKeyFromReference('start-0')
     const inputs = []
     const outputs = [{
-      lockingScript: this.getLockingScriptFromPrivateKey(initPrivateKey),
+      lockingScript: this.getLockingScriptFromPrivateKey(privateKey),
       change: true
     }]
     this.availableOutputs.forEach(output => {
@@ -198,10 +198,19 @@ class MockUser {
   };
 
   async initWallet () {
-    const initPrivateKey = this.getPrivateKeyFromReference('start-0')
-    const url = `https://api.whatsonchain.com/v1/bsv/main/address/${initPrivateKey.toAddress().toString()}/unspent`
+    await Promise.all([this.syncReference('start-0'),
+    this.syncReference('change-0'),
+    this.syncReference('p2p-0'),
+    this.syncReference('p2p-1'),
+    this.syncReference('change-1')]);
+  };
+
+  async syncReference (reference) {
+    const privateKet = this.getPrivateKeyFromReference(reference)
+    const url = `https://api.whatsonchain.com/v1/bsv/main/address/${privateKet.toAddress().toString()}/unspent`
     const response = await fetch(url)
     const utxos = await response.json()
+    if(utxos.length === 0) return;
     for (const utxo of utxos) {
       if (!this.rawTransactionMap.get(utxo.tx_hash)) {
         // convert to beef when WOC api allows it
@@ -212,12 +221,12 @@ class MockUser {
         // this will return 404 or get merkle proof
         this.rawTransactionMap.set(utxo.tx_hash, tx)
         tx.outputs.forEach((output, index) => {
-          if (output.lockingScript.toHex() === this.getLockingScriptFromPrivateKey(initPrivateKey).toHex()) {
+          if (output.lockingScript.toHex() === this.getLockingScriptFromPrivateKey(privateKet).toHex()) {
             this.availableOutputs.push({
               reference: this.getReferenceToken('start-0'),
               sourceTransactionId: utxo.tx_hash,
               sourceOutputIndex: index,
-              unlockingScriptTemplate: new P2PKH().unlock(initPrivateKey)
+              unlockingScriptTemplate: new P2PKH().unlock(privateKet)
             })
           }
         })

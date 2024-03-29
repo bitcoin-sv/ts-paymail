@@ -76,6 +76,7 @@
     "build:example": "npm run build && npm link && cd docs/examples && npm i && npm link @bsv/ts-paymail && tsc -p tsconfig.json",
     "start:example:server": "npm run build:example && cd docs/examples && npm run server",
     "example:getProfile": "npm run build:example && cd docs/examples && npm run getProfile",
+    "example:sendP2P": "npm run build:example && cd docs/examples && npm run sendP2P",
     "doc": "ts2md --inputFilename=src/capability/index.ts --outputFilename=docs/capability.md --filenameSubString=capability --firstHeadingLevel=1 && ts2md --inputFilename=src/paymailClient/paymailClient.ts --outputFilename=docs/paymailClient.md --filenameSubString=paymailClient --firstHeadingLevel=1 && npx ts2md --inputFilename=src/paymailRouter/paymailRouter.ts --outputFilename=docs/paymailRouter.md --filenameSubString=paymailRouter --firstHeadingLevel=1"
   },
   "author": "BSV Blockchain Association",

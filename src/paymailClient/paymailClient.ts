@@ -63,7 +63,7 @@ export default class PaymailClient {
     const schema = Joi.object({
       bsvalias: Joi.string().required(),
       capabilities: Joi.object().required()
-    })
+    }).options({ stripUnknown: true })
     const { error } = schema.validate(json)
     if (error) {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
@@ -128,7 +128,7 @@ export default class PaymailClient {
     const schema = Joi.object({
       name: Joi.string().required(),
       avatar: Joi.string().uri().required()
-    })
+    }).options({ stripUnknown: true })
 
     const { error, value } = schema.validate(response)
     if (error) {
@@ -149,7 +149,7 @@ export default class PaymailClient {
       bsvalias: Joi.string().optional().allow('1.0'),
       handle: Joi.string().required(),
       pubkey: Joi.string().required()
-    })
+    }).options({ stripUnknown: true })
     const { error, value } = schema.validate(response)
     if (error) {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
@@ -175,7 +175,7 @@ export default class PaymailClient {
           satoshis: Joi.number().required()
         }).required().min(1)),
       reference: Joi.string().required()
-    })
+    }).options({ stripUnknown: true })
     const { error } = schema.validate(response)
     if (error) {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
@@ -213,7 +213,7 @@ export default class PaymailClient {
     const schema = Joi.object({
       txid: Joi.string().required(),
       note: Joi.string().optional().allow('')
-    })
+    }).options({ stripUnknown: true })
     const { error, value } = schema.validate(response)
     if (error) {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
@@ -250,7 +250,7 @@ export default class PaymailClient {
       handle: Joi.string().required(),
       pubkey: Joi.string().required(),
       match: Joi.boolean().required()
-    })
+    }).options({ stripUnknown: true })
     const { error } = schema.validate(responseBody)
     if (error) {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
@@ -281,7 +281,7 @@ export default class PaymailClient {
     const schema = Joi.object({
       txid: Joi.string().required(),
       note: Joi.string().optional().allow('')
-    })
+    }).options({ stripUnknown: true })
     const { error, value } = schema.validate(response)
     if (error) {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)

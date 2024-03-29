@@ -5,7 +5,7 @@ const P2pPaymentDestinationCapability = new Capability({
   authors: ['Miguel Duarte (Money Button)', 'Ryan X. Charles (Money Button)', 'Ivan Mlinaric (Handcash)', 'Rafa (Handcash)'],
   version: '1.1',
   method: 'POST',
-  code: '2a40af698840',
+  code: '2a40af698840'
 })
 
 export default P2pPaymentDestinationCapability
