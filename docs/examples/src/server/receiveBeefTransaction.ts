@@ -1,5 +1,4 @@
-import { PaymailClient } from '../../../../dist/cjs/src/paymailClient/index.js';
-import { ReceiveBeefTransactionRoute } from '../../../../dist/cjs/src/paymailRouter/index.js';
+import { PaymailClient, ReceiveBeefTransactionRoute } from '@bsv/ts-paymail'
 import { Transaction } from '@bsv/sdk'
 import { fetchUser } from '../mockUser.js'
 

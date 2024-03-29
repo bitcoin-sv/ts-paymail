@@ -1,5 +1,5 @@
-import { P2pPaymentDestinationRoute } from '../../../../dist/cjs/src/paymailRouter/index.js';
 
+import { P2pPaymentDestinationRoute } from '@bsv/ts-paymail'
 import { fetchUser } from '../mockUser.js'
 
 const p2pDestinationsRoute = new P2pPaymentDestinationRoute({

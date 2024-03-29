@@ -1,10 +1,10 @@
 import express from 'express'
-import { PaymailRouter } from '../../../dist/cjs/src/paymailRouter/index.js';
+import { PaymailRouter } from '@bsv/ts-paymail'
 import publicProfileRoute from './server/publicProfile.js'
 import pkiRoute from './server/pki.js'
 import p2pDestinationsRoute from './server/p2pDestinations.js'
 import receiveTransactionRoute from './server/receiveTransaction.js'
-import { mockUser2 } from './mockUser.js'
+import { mockUser1, mockUser2 } from './mockUser.js'
 
 const app = express()
 

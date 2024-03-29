@@ -1,5 +1,5 @@
-import { PaymailClient } from '../../../../dist/cjs/src/paymailClient/index.js';
-import { mockUser1, mockUser2 } from '../mockUser.js'
+import { PaymailClient } from '@bsv/ts-paymail'
+import { mockUser1, mockUser2 } from '../mockUser'
 
 const client = new PaymailClient();
 

@@ -1,4 +1,4 @@
-import jwt from 'jwt-simple';
+import jwt from 'jwt-simple'
 import { HD, P2PKH, Transaction, ARC, PrivateKey, LockingScript } from '@bsv/sdk'
 
 class MockUser {

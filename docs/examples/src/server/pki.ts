@@ -1,5 +1,5 @@
-import { PublicKeyInfrastructureRoute } from '../../../../dist/cjs/src/paymailRouter/index.js';
 
+import { PublicKeyInfrastructureRoute } from '@bsv/ts-paymail'
 import { fetchUser } from '../mockUser.js'
 
 const pkiRoute = new PublicKeyInfrastructureRoute({

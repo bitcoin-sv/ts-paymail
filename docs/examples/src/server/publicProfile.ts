@@ -1,5 +1,5 @@
-import { PublicProfileRoute } from '../../../../dist/cjs/src/paymailRouter/index.js';
-import { fetchUser } from '../mockUser.js';
+import { PublicProfileRoute } from '@bsv/ts-paymail'
+import { fetchUser } from '../mockUser.js'
 
 const publicProfileRoute = new PublicProfileRoute({
   domainLogicHandler: async (name, domain) => {
