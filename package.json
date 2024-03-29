@@ -73,7 +73,7 @@
     "build": "tsc -b && tsconfig-to-dual-package tsconfig.cjs.json",
     "dev": "tsc -b -w",
     "prepublish": "npm run build",
-    "build:example": "npm link && cd docs/examples && npm i && npm link @bsv/ts-paymail && tsc -p tsconfig.json",
+    "build:example": "npm run build && npm link && cd docs/examples && npm i && npm link @bsv/ts-paymail && tsc -p tsconfig.json",
     "start:example:server": "npm run build:example && cd docs/examples && npm run server",
     "example:getProfile": "npm run build:example && cd docs/examples && npm run getProfile",
     "doc": "ts2md --inputFilename=src/capability/index.ts --outputFilename=docs/capability.md --filenameSubString=capability --firstHeadingLevel=1 && ts2md --inputFilename=src/paymailClient/paymailClient.ts --outputFilename=docs/paymailClient.md --filenameSubString=paymailClient --firstHeadingLevel=1 && npx ts2md --inputFilename=src/paymailRouter/paymailRouter.ts --outputFilename=docs/paymailRouter.md --filenameSubString=paymailRouter --firstHeadingLevel=1"

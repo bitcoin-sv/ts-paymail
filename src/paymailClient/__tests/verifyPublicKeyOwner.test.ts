@@ -5,7 +5,7 @@ describe('#PaymailClient - Verify Public Key Owner', () => {
   let paymailClient
 
   beforeAll(() => {
-    paymailClient = new PaymailClient(new HttpClient(fetch))
+    paymailClient = new PaymailClient(new HttpClient(fetch), undefined, undefined)
   })
 
   it('should verify the public key owner', async () => {

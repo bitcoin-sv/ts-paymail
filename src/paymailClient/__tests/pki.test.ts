@@ -5,7 +5,7 @@ describe('#PaymailClient - Public Key Infrastructure', () => {
   let paymailClient
 
   beforeAll(() => {
-    paymailClient = new PaymailClient(new HttpClient(fetch))
+    paymailClient = new PaymailClient(new HttpClient(fetch), undefined, undefined)
   })
 
   it('should retrieve the public key for a given paymail handle', async () => {
