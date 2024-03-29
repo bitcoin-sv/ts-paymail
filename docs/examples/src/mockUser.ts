@@ -112,8 +112,6 @@ class MockUser {
         throw new Error('Source transaction not found')
       }
       const sourceOutput = sourceTx.outputs[output.sourceOutputIndex]
-      console.log('sourceOutput', output)
-      console.log(sourceTx.id('hex'))
       inputs.push({
         sourceTransaction: sourceTx,
         sourceOutputIndex: output.sourceOutputIndex,
@@ -128,7 +126,6 @@ class MockUser {
     const tx = new Transaction(1, inputs, outputs)
     await tx.fee()
     await tx.sign()
-    console.log(tx.toHexBEEF())
 
     this.availableOutputs = this.availableOutputs.filter(output => {
       return !usedOutputReferences.includes(`${output.sourceTransactionId}:${output.sourceOutputIndex}`)
@@ -155,7 +152,6 @@ class MockUser {
 
   async broadcastTransaction (tx: Transaction) {
     const result = await tx.broadcast(new ARC('https://api.taal.com/arc', 'mainnet_b1cb84c784c8e835dbc13c18d74077f3'))
-    console.log('ARC Transaction broadcasted', result)
   };
 
   // Clean user wallet by consolidating outputs
