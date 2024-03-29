@@ -21,7 +21,7 @@ const receiveBeefTransactionRoute = new ReceiveBeefTransactionRoute({
       txid: tx.id('hex')
     }
   },
-  verifySignature: true,
+  verifySignature: false,
   paymailClient: new PaymailClient()
 })
 

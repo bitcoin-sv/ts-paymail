@@ -12,7 +12,7 @@ const receiveTransactionRoute = new ReceiveTransactionRoute({
       txid: tx.id('hex')
     }
   },
-  verifySignature: true,
+  verifySignature: false,
   paymailClient: new PaymailClient()
 })
 

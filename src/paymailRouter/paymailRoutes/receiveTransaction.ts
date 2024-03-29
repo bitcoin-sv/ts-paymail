@@ -41,17 +41,18 @@ export default class ReceiveTransactionRoute extends PaymailRoute {
   }
 
   private buildSchema() {
+    console.log(this.verifySignature)
     const metadataSchema = Joi.object({
       sender: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
       pubkey: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
       signature: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
       note: Joi.string().allow('').optional(),
-    });
+    }).options({ stripUnknown: true });
     return Joi.object({
       hex: Joi.string().required(),
       metadata: this.verifySignature ? metadataSchema.required() : metadataSchema,
       reference: Joi.string().required(),
-    });
+    }).options({ stripUnknown: true });
   }
 
   private async validateTransaction(value: any) {
