@@ -16,10 +16,10 @@ interface PaymailRouterConfig {
  * It sets up the necessary routes and handlers based on the given configuration.
  */
 export default class PaymailRouter {
-  private readonly router: Router;
-  public baseUrl: string;
-  public routes: PaymailRoute[];
-  public requestSenderValidation: boolean;
+  private readonly router: Router
+  public baseUrl: string
+  public routes: PaymailRoute[]
+  public requestSenderValidation: boolean
 
   /**
    * Creates an instance of PaymailRouter.
@@ -52,7 +52,7 @@ export default class PaymailRouter {
     this.router.use(this.defaultErrorHandler())
   }
 
-    /**
+  /**
    * Default error handler for the PaymailRouter.
    * @returns An express middleware for handling errors.
    */
@@ -65,7 +65,7 @@ export default class PaymailRouter {
     }
   }
 
-    /**
+  /**
    * Adds a route for handling the well-known BSV alias protocol.
    */
   private addWellKnownRouter (): void {
@@ -88,7 +88,7 @@ export default class PaymailRouter {
     return parts.map(part => part.replace(/(^\/+|\/+$)/g, '')).join('/')
   }
 
-    /**
+  /**
    * Gets the configured express Router.
    * @returns The express Router with all configured routes and handlers.
    */

@@ -8,6 +8,8 @@
   - [Getting Started](#getting-started)
     - [npm install](#npm-install)
     - [Basic Usage](#basic-usage)
+      - [Paymail Server](#paymail-server)
+      - [Paymail Client](#paymail-client)
   - [Documentation](#documentation)
   - [Contribution Guidelines](#contribution-guidelines)
   - [Support \& Contacts](#support--contacts)
@@ -35,9 +37,58 @@ npm install @bsv/ts-paymail
 
 ### Basic Usage
 
+#### Paymail Server
+```typescript
+import express from 'express'
+import { PaymailRouter, PublicKeyInfrastructureRoute, PublicProfileRoute } from '@bsv/ts-paymail'
+
+const app = express()
+const baseUrl = 'https://myDomain.com'
+
+const publicProfileRoute = new PublicProfileRoute({
+  domainLogicHandler: async (name, domain) => {
+    const user = await fetchUser(name, domain)
+    return {
+      name: user.getAlias(),
+      domain,
+      avatar: user.getAvatarUrl()
+    }
+  }
+})
+
+const pkiRoute = new PublicKeyInfrastructureRoute({
+  domainLogicHandler: async (name, domain) => {
+    const user = await fetchUser(name, domain)
+    return {
+      bsvalias: '1.0',
+      handle: `${name}@${domain}`,
+      pubkey: user.getIdentityKey()
+    }
+  }
+})
+
+const routes = [publicProfileRoute, pkiRoute]
+const paymailRouter = new PaymailRouter({ baseUrl, routes })
+app.use(paymailRouter.getRouter())
+
+const PORT = 3000
+app.listen(PORT, async () => {
+  console.log(`Server is running on ${baseUrl}:${PORT}`)
+})
+```
+
+#### Paymail Client
 
 ```typescript
-// TODO: Code Example Will Go Here
+import { PaymailClient } from '@bsv/ts-paymail'
+
+const client = new PaymailClient();
+
+(async () => {
+  const publicProfile = await client.getPublicProfile('satoshi@myDomain.com')
+  console.log(publicProfile)
+})()
+
 ```
 
 For a more detailed tutorial and advanced examples, check our [Documentation](#documentation).
@@ -45,7 +96,7 @@ For a more detailed tutorial and advanced examples, check our [Documentation](#d
 
 ## Documentation
 
-Provide detailed information and links to the various places the project is documented, including concepts, getting started guides, tutorials, and API specifications.
+The SDK is richly documented with code-level annotations. This should show up well within editors like VSCode. For complete API docs, check out [the docs folder](./docs)
 
 ## Contribution Guidelines
 
@@ -63,10 +114,9 @@ For more details, check the [contribution guidelines](./CONTRIBUTING.md).
 For information on past releases, check out the [changelog](./CHANGELOG.md). For future plans, check the [roadmap](./ROADMAP.md)!
 
 ## Support & Contacts
+Project Owners: Thomas Giacomo and Darren Kellenschwiler
 
-Project Owners: `<names and email addresses>`
-
-Development Team Lead: `<name and email>`
+Development Team Lead: Brandon Bryant
 
 For questions, bug reports, or feature requests, please open an issue on GitHub or contact us directly.
 

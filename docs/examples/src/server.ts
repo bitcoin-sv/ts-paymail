@@ -1,46 +1,36 @@
 import express from 'express'
-import { PaymailRouter } from '@bsv/ts-paymail'
-import publicProfileRoute from './server/publicProfile.js'
-import pkiRoute from './server/pki.js'
-import p2pDestinationsRoute from './server/p2pDestinations.js'
-import receiveTransactionRoute from './server/receiveTransaction.js'
-import { mockUser1, mockUser2 } from './mockUser.js'
+import { PaymailRouter, PublicKeyInfrastructureRoute, PublicProfileRoute } from '@bsv/ts-paymail'
 
 const app = express()
+const baseUrl = 'https://myDomain.com'
 
-const baseUrl = 'http://localhost:3000'
-
-const routes = [publicProfileRoute, pkiRoute, p2pDestinationsRoute, receiveTransactionRoute]
-
-const paymailRouter = new PaymailRouter({ baseUrl, routes })
-
-app.use(paymailRouter.getRouter())
-
-function requestResponseLogger (req, res, next) {
-  console.log(`Incoming Request: ${req.method} ${req.originalUrl}`)
-  const originalSend = res.send
-  res.send = function (data) {
-    console.log(`Outgoing Response: ${res.statusCode}`)
-    console.log(`Response Body: ${data}`)
-    return originalSend.apply(res, arguments)
+const publicProfileRoute = new PublicProfileRoute({
+  domainLogicHandler: async (name, domain) => {
+    const user = await fetchUser(name, domain)
+    return {
+      name: user.getAlias(),
+      domain,
+      avatar: user.getAvatarUrl()
+    }
   }
-  next()
-}
+})
 
-app.use(requestResponseLogger)
+const pkiRoute = new PublicKeyInfrastructureRoute({
+  domainLogicHandler: async (name, domain) => {
+    const user = await fetchUser(name, domain)
+    return {
+      bsvalias: '1.0',
+      handle: `${name}@${domain}`,
+      pubkey: user.getIdentityKey()
+    }
+  }
+})
+
+const routes = [publicProfileRoute, pkiRoute]
+const paymailRouter = new PaymailRouter({ baseUrl, routes })
+app.use(paymailRouter.getRouter())
 
 const PORT = 3000
 app.listen(PORT, async () => {
   console.log(`Server is running on http://localhost:${PORT}`)
-  await mockUser2.initWallet()
-  setInterval(async () => {
-    console.log('mock user 2 balance', await mockUser2.getSatoshiBalance())
-  }, 5000)
-
-  setInterval(async () => {
-    console.log('mock user 2 balance', await mockUser2.getSatoshiBalance())
-    console.log('closing wallet')
-    await mockUser2.closeWallet()
-    console.log('mock user 2 balance', await mockUser2.getSatoshiBalance())
-  }, 60000)
 })
