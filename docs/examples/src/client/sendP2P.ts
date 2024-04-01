@@ -1,5 +1,6 @@
-import { PaymailClient } from '@bsv/ts-paymail'
+import { PaymailClient } from '@bsv/paymail'
 import { mockUser1, mockUser2 } from '../mockUser'
+
 
 const client = new PaymailClient();
 

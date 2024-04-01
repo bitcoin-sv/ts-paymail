@@ -1,5 +1,5 @@
+import { PaymailClient } from '@bsv/paymail'
 import { MerklePath } from '@bsv/sdk'
-import { PaymailClient } from '@bsv/ts-paymail'
 import { mockUser1, mockUser2 } from '../mockUser'
 
 const client = new PaymailClient();

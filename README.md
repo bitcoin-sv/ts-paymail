@@ -32,7 +32,7 @@ The project aims to streamline the process of integrating BSV Paymail into vario
 
 
 ```bash
-npm install @bsv/ts-paymail
+npm install @bsv/paymail
 ```
 
 ### Basic Usage
@@ -40,7 +40,7 @@ npm install @bsv/ts-paymail
 #### Paymail Server
 ```typescript
 import express from 'express'
-import { PaymailRouter, PublicKeyInfrastructureRoute, PublicProfileRoute } from '@bsv/ts-paymail'
+import { PaymailRouter, PublicKeyInfrastructureRoute, PublicProfileRoute } from '@bsv/paymail'
 
 const app = express()
 const baseUrl = 'https://myDomain.com'
@@ -80,7 +80,7 @@ app.listen(PORT, async () => {
 #### Paymail Client
 
 ```typescript
-import { PaymailClient } from '@bsv/ts-paymail'
+import { PaymailClient } from '@bsv/paymail'
 
 const client = new PaymailClient();
 

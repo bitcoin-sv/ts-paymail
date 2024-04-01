@@ -28,7 +28,7 @@ import p2pDestinationsRoute from './server/p2pDestinations';
 import receiveTransactionRoute from './server/receiveTransaction';
 import publicProfileRoute from './server/publicProfile';
 import pkiRoute from './server/pki';
-import { PaymailRouter } from '@bsv/ts-paymail';
+import { PaymailRouter } from '@bsv/paymail';
 
 const app = express()
 const DOMAIN = process.env.DOMAIN ?? 'localhost' // Replace with your actual domain

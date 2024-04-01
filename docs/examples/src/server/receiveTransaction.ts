@@ -1,4 +1,4 @@
-import { PaymailClient, ReceiveTransactionRoute } from '@bsv/ts-paymail'
+import { PaymailClient, ReceiveTransactionRoute } from '@bsv/paymail'
 import { fetchUser } from '../mockUser.js'
 import { Transaction } from '@bsv/sdk'
 
