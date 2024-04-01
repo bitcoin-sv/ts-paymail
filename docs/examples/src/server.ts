@@ -28,7 +28,7 @@ import p2pDestinationsRoute from './server/p2pDestinations';
 import receiveTransactionRoute from './server/receiveTransaction';
 import publicProfileRoute from './server/publicProfile';
 import pkiRoute from './server/pki';
-import { PaymailRouter } from '@bsv/ts-paymail';
+import { PaymailRouter } from '@bsv/paymail';
 
 const app = express()
 const baseUrl = 'https://e2be-71-234-4-191.ngrok-free.app' // Replace with your actual domain

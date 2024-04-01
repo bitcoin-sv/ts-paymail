@@ -1,5 +1,5 @@
 {
-  "name": "@bsv/ts-paymail",
+  "name": "@bsv/paymail",
   "version": "1.0.0",
   "description": "BSV Paymail library",
   "main": "dist/cjs/mod.js",
@@ -73,7 +73,7 @@
     "build": "tsc -b && tsconfig-to-dual-package tsconfig.cjs.json",
     "dev": "tsc -b -w",
     "prepublish": "npm run build",
-    "build:example": "npm run build && npm link && cd docs/examples && npm i && npm link @bsv/ts-paymail && tsc -p tsconfig.json",
+    "build:example": "npm run build && npm link && cd docs/examples && npm i && npm link @bsv/paymail && tsc -p tsconfig.json",
     "start:example:server": "npm run build:example && cd docs/examples && npm run server",
     "example:getProfile": "npm run build:example && cd docs/examples && npm run getProfile",
     "example:sendP2P": "npm run build:example && cd docs/examples && npm run sendP2P",

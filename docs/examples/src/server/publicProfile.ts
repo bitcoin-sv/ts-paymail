@@ -1,4 +1,4 @@
-import { PublicProfileRoute } from '@bsv/ts-paymail'
+import { PublicProfileRoute } from '@bsv/paymail'
 import { fetchUser } from '../mockUser.js'
 
 const publicProfileRoute = new PublicProfileRoute({
