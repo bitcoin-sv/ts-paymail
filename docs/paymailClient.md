@@ -135,6 +135,22 @@ export default class PaymailClient {
         }
         return response;
     };
+    public getP2pOrdinalDestinations = async (paymail: string, ordinals: number): Promise<any> => {
+        const response = await this.request(paymail, SimpleP2pOrdinalDestinationsCapability, {
+            ordinals
+        });
+        const schema = Joi.object({
+            outputs: Joi.array().items(Joi.object({
+                script: Joi.string().required()
+            }).required().min(1)),
+            reference: Joi.string().required()
+        }).options({ stripUnknown: true });
+        const { error } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        return response;
+    };
     public sendTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
         sender: string;
         pubkey: string;
@@ -142,6 +158,27 @@ export default class PaymailClient {
         note: string;
     }) => {
         const response = await this.request(paymail, ReceiveTransactionCapability, {
+            hex,
+            reference,
+            metadata
+        });
+        const schema = Joi.object({
+            txid: Joi.string().required(),
+            note: Joi.string().optional().allow("")
+        }).options({ stripUnknown: true });
+        const { error, value } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        return value;
+    };
+    public sendOrdinalTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
+        sender: string;
+        pubkey: string;
+        signature: string;
+        note: string;
+    }) => {
+        const response = await this.request(paymail, SimpleP2pOrdinalReceiveCapability, {
             hex,
             reference,
             metadata
@@ -252,6 +289,29 @@ public ensureCapabilityFor = async (aDomain, aCapability) => {
 }
 ```
 
+### Property getP2pOrdinalDestinations
+
+Requests a P2P ordinal destination for a given Paymail.
+
+```ts
+public getP2pOrdinalDestinations = async (paymail: string, ordinals: number): Promise<any> => {
+    const response = await this.request(paymail, SimpleP2pOrdinalDestinationsCapability, {
+        ordinals
+    });
+    const schema = Joi.object({
+        outputs: Joi.array().items(Joi.object({
+            script: Joi.string().required()
+        }).required().min(1)),
+        reference: Joi.string().required()
+    }).options({ stripUnknown: true });
+    const { error } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return response;
+}
+```
+
 ### Property getP2pPaymentDestination
 
 Requests a P2P payment destination for a given Paymail.
@@ -349,6 +409,35 @@ public sendBeefTransactionP2P = async (paymail: string, beef: string, reference:
 }) => {
     const response = await this.request(paymail, ReceiveBeefTransactionCapability, {
         beef,
+        reference,
+        metadata
+    });
+    const schema = Joi.object({
+        txid: Joi.string().required(),
+        note: Joi.string().optional().allow("")
+    }).options({ stripUnknown: true });
+    const { error, value } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return value;
+}
+```
+
+### Property sendOrdinalTransactionP2P
+
+Sends a transaction using the Pay-to-Peer (P2P) protocol.
+This method is used to send a transaction to a Paymail address.
+
+```ts
+public sendOrdinalTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
+    sender: string;
+    pubkey: string;
+    signature: string;
+    note: string;
+}) => {
+    const response = await this.request(paymail, SimpleP2pOrdinalReceiveCapability, {
+        hex,
         reference,
         metadata
     });

@@ -11,6 +11,8 @@ import P2pPaymentDestinationCapability from '../capability/p2pPaymentDestination
 import ReceiveTransactionCapability from '../capability/p2pReceiveTransactionCapability.js'
 import VerifyPublicKeyOwnerCapability from '../capability/verifyPublicKeyOwnerCapability.js'
 import ReceiveBeefTransactionCapability from '../capability/p2pReceiveBeefTransactionCapability.js'
+import SimpleP2pOrdinalDestinationsCapability from '../capability/simpleP2pOrdinalDestinationsCapability.js'
+import SimpleP2pOrdinalReceiveCapability from '../capability/simpleP2pOrdinalReceiveCapability.js'
 const { sha256 } = Hash
 
 /**
@@ -189,6 +191,31 @@ export default class PaymailClient {
   }
 
   /**
+   * Requests a P2P ordinal destination for a given Paymail.
+   * @param paymail - The Paymail address to request the payment destination for.
+   * @param ordinals - The amount of ordinals to be sent in transaction
+   * @returns An object containing the ordinal destination details.
+   */
+  public getP2pOrdinalDestinations = async (paymail: string, ordinals: number): Promise<any> => {
+    const response = await this.request(paymail, SimpleP2pOrdinalDestinationsCapability, {
+      ordinals
+    })
+
+    const schema = Joi.object({
+      outputs: Joi.array().items(
+        Joi.object({
+          script: Joi.string().required()
+        }).required().min(1)),
+      reference: Joi.string().required()
+    }).options({ stripUnknown: true })
+    const { error } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return response
+  }
+
+  /**
  * Sends a transaction using the Pay-to-Peer (P2P) protocol.
  * This method is used to send a transaction to a Paymail address.
  *
@@ -206,6 +233,40 @@ export default class PaymailClient {
     note: string
   }) => {
     const response = await this.request(paymail, ReceiveTransactionCapability, {
+      hex,
+      reference,
+      metadata
+    })
+
+    const schema = Joi.object({
+      txid: Joi.string().required(),
+      note: Joi.string().optional().allow('')
+    }).options({ stripUnknown: true })
+    const { error, value } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return value
+  }
+
+  /**
+ * Sends a transaction using the Pay-to-Peer (P2P) protocol.
+ * This method is used to send a transaction to a Paymail address.
+ *
+ * @param paymail - The Paymail address to send the transaction to.
+ * @param hex - The transaction in hexadecimal format.
+ * @param reference - A reference identifier for the transaction.
+ * @param metadata - Optional metadata for the transaction including sender, public key, signature, and note.
+ * @returns A Promise that resolves to an object containing the transaction ID and an optional note.
+ * @throws PaymailServerResponseError - Thrown if there is a validation error in the response.
+ */
+  public sendOrdinalTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
+    sender: string
+    pubkey: string
+    signature: string
+    note: string
+  }) => {
+    const response = await this.request(paymail, SimpleP2pOrdinalReceiveCapability, {
       hex,
       reference,
       metadata
