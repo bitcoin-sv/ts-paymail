@@ -1,5 +1,6 @@
 import jwt from 'jwt-simple'
 import { HD, P2PKH, Transaction, ARC, PrivateKey, LockingScript } from '@bsv/sdk'
+const DOMAIN = process.env.DOMAIN ?? 'localhost'
 
 class MockUser {
   private static readonly IDENTITY_KEY_PATH = 'm/0'
@@ -9,6 +10,7 @@ class MockUser {
   private static readonly START_PATH = 'm/3'
 
   private readonly alias: string
+  private readonly domain: string
   private readonly avatarUrl: string
   private readonly extendedPrivateKey: string
   private readonly secret: string
@@ -17,13 +19,14 @@ class MockUser {
   private p2pIndex = 0
   private changeIndex = 0
 
-  constructor (alias, avatartUrl, extendedPrivateKey, jwtSecret = 'secret') {
+  constructor (alias, domain, avatarUrl, extendedPrivateKey, jwtSecret = 'secret') {
     this.alias = alias
-    this.avatarUrl = avatartUrl
+    this.avatarUrl = avatarUrl
     this.extendedPrivateKey = extendedPrivateKey
     this.secret = jwtSecret
     this.availableOutputs = []
     this.rawTransactionMap = new Map()
+    this.domain = domain
   }
 
   getAlias () {
@@ -94,8 +97,6 @@ class MockUser {
   async getSpendingTransactionToScript (lockingScript, amount) : Promise<{ tx: Transaction, reference: string }>{
     let targetAmount = amount
     const { changeOutput, changeIndex } = this.getChangeOutput()
-    const outputs = []
-    const inputs = []
     const tx = new Transaction()
     tx.addOutput({
       lockingScript: LockingScript.fromHex(lockingScript),
@@ -152,7 +153,7 @@ class MockUser {
   };
 
   async broadcastTransaction (tx: Transaction) {
-    const result = await tx.broadcast(new ARC('https://api.taal.com/arc', 'mainnet_b1cb84c784c8e835dbc13c18d74077f3'))
+    const result = await tx.broadcast(new ARC('https://api.taal.com/arc', 'mainnet_06770f425eb00298839a24a49cbdc02c'))
   };
 
   // Clean user wallet by consolidating outputs
@@ -239,17 +240,19 @@ class MockUser {
   }
 
   getPaymail () {
-    return this.alias + '@localhost'
+    return this.alias + '@' + this.domain
   }
 }
 
 const mockUser1 = new MockUser(
   'satoshi',
+  DOMAIN,
   'https://cdns-images.dzcdn.net/images/artist/0cd4444701460a1ccf94d150e37476d9/500x500.jpg',
   'xprv9s21ZrQH143K3JXfv6ia4roUARejG3VEEjbhNS1BbeHMFF2V1zBd949FrxUJZat3FSFLEA9wZxjUV2NdbbvD9uCiibdRfpaBVGysQaZxduX')
 
 const mockUser2 = new MockUser(
   'Hal Finney',
+  DOMAIN,
   'https://upload.wikimedia.org/wikipedia/en/5/52/Hal_Finney_%28computer_scientist%29.jpg',
   'xprv9s21ZrQH143K2KtoM9eftnf2f2AiwNTSfnwABjsZAnfF4ntLF9ExqSR533ic6q4hb9zzm5Ybmr5HQ7p8MHMfaWMG98CSzUCXDnjXsCnrryP')
 
