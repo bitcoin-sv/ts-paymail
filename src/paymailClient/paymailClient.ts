@@ -11,6 +11,8 @@ import P2pPaymentDestinationCapability from '../capability/p2pPaymentDestination
 import ReceiveTransactionCapability from '../capability/p2pReceiveTransactionCapability.js'
 import VerifyPublicKeyOwnerCapability from '../capability/verifyPublicKeyOwnerCapability.js'
 import ReceiveBeefTransactionCapability from '../capability/p2pReceiveBeefTransactionCapability.js'
+import NegotiationCapability from '../capability/negotiationCapabilities.js'
+import TransactionNegotiationCapabilities, { TransactionNegotiationBody } from '../capability/transactionNegotiationCapability.js'
 import SimpleP2pOrdinalDestinationsCapability from '../capability/simpleP2pOrdinalDestinationsCapability.js'
 import SimpleP2pOrdinalReceiveCapability from '../capability/simpleP2pOrdinalReceiveCapability.js'
 const { sha256 } = Hash
@@ -352,5 +354,39 @@ export default class PaymailClient {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
     }
     return value
+  }
+
+  /**
+   * Retrieves the transaction negotiation capabilities for a given Paymail.
+   * @param paymail - The Paymail address to query for negotiation capabilities.
+   * @returns An object representing the negotiation capabilities.
+   * @throws PaymailServerResponseError - Thrown if there is a validation error in the response.
+   */
+  public getTransactionNegotiationCapabilities = async (paymail: string) => {
+    const response = await this.request(paymail, NegotiationCapability)
+    const schema = Joi.object({
+      send_disabled: Joi.boolean().default(false),
+      auto_send_response: Joi.boolean().default(false),
+      receive: Joi.boolean().default(false),
+      three_step_exchange: Joi.boolean().default(false),
+      four_step_exchange: Joi.boolean().default(false),
+      auto_exchange_response: Joi.boolean().default(false)
+    }).options({ stripUnknown: true })
+    const { error, value } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return value
+  }
+
+  /**
+   * Sends a transaction negotiation request to a Paymail address.
+   * @param paymail - The Paymail address to send the negotiation request to.
+   * @param body - The transaction negotiation request body.
+   * @returns The response from the Paymail service.
+   */
+  public sendTransactionNegotiation = async (paymail: string, body: TransactionNegotiationBody) => {
+    const response = await this.request(paymail, TransactionNegotiationCapabilities, body)
+    return response
   }
 }

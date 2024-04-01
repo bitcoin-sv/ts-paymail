@@ -238,6 +238,26 @@ export default class PaymailClient {
         }
         return value;
     };
+    public getTransactionNegotiationCapabilities = async (paymail: string) => {
+        const response = await this.request(paymail, NegotiationCapability);
+        const schema = Joi.object({
+            send_disabled: Joi.boolean().default(false),
+            auto_send_response: Joi.boolean().default(false),
+            receive: Joi.boolean().default(false),
+            three_step_exchange: Joi.boolean().default(false),
+            four_step_exchange: Joi.boolean().default(false),
+            auto_exchange_response: Joi.boolean().default(false)
+        }).options({ stripUnknown: true });
+        const { error, value } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        return value;
+    };
+    public sendTransactionNegotiation = async (paymail: string, body: TransactionNegotiationBody) => {
+        const response = await this.request(paymail, TransactionNegotiationCapabilities, body);
+        return response;
+    };
 }
 ```
 
@@ -378,6 +398,29 @@ public getPublicProfile = async (paymail) => {
 }
 ```
 
+### Property getTransactionNegotiationCapabilities
+
+Retrieves the transaction negotiation capabilities for a given Paymail.
+
+```ts
+public getTransactionNegotiationCapabilities = async (paymail: string) => {
+    const response = await this.request(paymail, NegotiationCapability);
+    const schema = Joi.object({
+        send_disabled: Joi.boolean().default(false),
+        auto_send_response: Joi.boolean().default(false),
+        receive: Joi.boolean().default(false),
+        three_step_exchange: Joi.boolean().default(false),
+        four_step_exchange: Joi.boolean().default(false),
+        auto_exchange_response: Joi.boolean().default(false)
+    }).options({ stripUnknown: true });
+    const { error, value } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return value;
+}
+```
+
 ### Property request
 
 Makes a generic request to a Paymail service.
@@ -450,6 +493,17 @@ public sendOrdinalTransactionP2P = async (paymail: string, hex: string, referenc
         throw new PaymailServerResponseError(`Validation error: ${error.message}`);
     }
     return value;
+}
+```
+
+### Property sendTransactionNegotiation
+
+Sends a transaction negotiation request to a Paymail address.
+
+```ts
+public sendTransactionNegotiation = async (paymail: string, body: TransactionNegotiationBody) => {
+    const response = await this.request(paymail, TransactionNegotiationCapabilities, body);
+    return response;
 }
 ```
 

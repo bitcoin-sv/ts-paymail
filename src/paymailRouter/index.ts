@@ -6,3 +6,5 @@ export { default as ReceiveTransactionRoute } from './paymailRoutes/receiveTrans
 export { default as PublicProfileRoute } from './paymailRoutes/publicProfileRoute.js'
 export { default as VerifyPublicKeyOwnerRoute } from './paymailRoutes/verifyPublicKeyOwner.js'
 export { default as ReceiveBeefTransactionRoute } from './paymailRoutes/receiveBeefTransaction.js'
+export { default as NegotiationCapabilitiesRoute } from './paymailRoutes/negotiationCapability.js'
+export { default as TransactionNegotiationCapabilitiesRoute } from './paymailRoutes/transactionNegotiationCapabilities.js'

@@ -6,3 +6,5 @@ export { default as ReceiveTransactionCapability } from './p2pReceiveTransaction
 export { default as RequestSenderValidationCapability } from './requestSenderValidationCapability.js'
 export { default as VerifyPublicKeyOwnerCapability } from './verifyPublicKeyOwnerCapability.js'
 export { default as P2pReceiveBeefTransactionCapability } from './p2pReceiveBeefTransactionCapability.js'
+export { default as NegotiationCapability } from './negotiationCapabilities.js'
+export { default as TransactionNegotiationCapability } from './transactionNegotiationCapability.js'
