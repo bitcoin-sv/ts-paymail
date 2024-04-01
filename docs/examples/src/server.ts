@@ -31,7 +31,8 @@ import pkiRoute from './server/pki';
 import { PaymailRouter } from '@bsv/paymail';
 
 const app = express()
-const baseUrl = 'https://e2be-71-234-4-191.ngrok-free.app' // Replace with your actual domain
+const DOMAIN = process.env.DOMAIN ?? 'localhost' // Replace with your actual domain
+const baseUrl = 'https://' + DOMAIN
 
 
 const routes = [publicProfileRoute, pkiRoute, p2pDestinationsRoute, receiveTransactionRoute]
@@ -40,5 +41,5 @@ app.use(paymailRouter.getRouter())
 
 const PORT = 3000
 app.listen(PORT, async () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
+  console.log(`Server is running on ${baseUrl}:${PORT}`)
 })

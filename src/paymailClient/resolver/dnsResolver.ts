@@ -73,11 +73,12 @@ class DNSResolver extends AbstractResolver {
   private readonly resolveWithDoh = async (aDomain: string): Promise<any> => {
     const response = await this.httpClient.request(`${this.dohServiceBaseUrl}?name=${aDomain}&type=SRV&cd=0`)
     const dohResponse = await response.json()
+    const domain = this.domainWithoutBsvAliasPrefix(aDomain)
 
     // Record not found assume port 443 and domain is the same as the input per spec
     if (dohResponse.Status === 3) {
       return {
-        domain: aDomain.replace('_bsvalias._tcp.', ''),
+        domain,
         port: 443
       }
     }
@@ -90,7 +91,7 @@ class DNSResolver extends AbstractResolver {
     let responseDomain = data[3]
     responseDomain = responseDomain.endsWith('.') ? responseDomain.slice(0, -1) : responseDomain
 
-    if (!dohResponse.AD && !this.domainsAreEqual(aDomain, responseDomain)) {
+    if (!dohResponse.AD && !this.domainsAreEqual(domain, responseDomain)) {
       throw new PaymailServerResponseError(`${this.domainWithoutBsvAliasPrefix(aDomain)} is not correctly configured: insecure domain`)
     }
 
