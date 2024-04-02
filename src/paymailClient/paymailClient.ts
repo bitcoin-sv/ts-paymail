@@ -228,7 +228,10 @@ export default class PaymailClient {
    * @returns A hex string representing the digital signature.
    */
   public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
-    return ECDSA.sign(BigNumber.fromHex(txid), privKey, true).toCompact('base64') as string
+    const msgHash = BigNumber.fromHex(txid)
+    const sig = ECDSA.sign(msgHash, privKey, true)
+    const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), msgHash)
+    return sig.toCompact(recovery, true, 'base64') as string
   }
 
   /**
