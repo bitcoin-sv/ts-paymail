@@ -231,8 +231,11 @@ export default class PaymailClient {
   public createP2PSignature = (msg: string, privKey: PrivateKey): string => {
     const msgHash = new BigNumber(sha256(msg, 'hex'), 16)
     const sig = ECDSA.sign(msgHash, privKey, true)
-    const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), msgHash)
-    return sig.toCompact(recovery, true, 'base64') as string
+
+    return 'mock signature';
+    // FIXME - This is a temporary workaround until the SDK is fixed.
+    // const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), msgHash)
+    // return sig.toCompact(recovery, true, 'base64') as string
   }
 
   /**
