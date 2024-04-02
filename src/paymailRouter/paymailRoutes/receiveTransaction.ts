@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { PublicKey, Transaction, Signature } from '@bsv/sdk';
+import { PublicKey, Transaction, Signature, Utils } from '@bsv/sdk';
 import PaymailRoute, { DomainLogicHandler } from './paymailRoute.js';
 import P2pReceiveTransactionCapability from '../../capability/p2pReceiveTransactionCapability.js';
 import { PaymailBadRequestError } from '../../errors/index.js';
@@ -89,7 +89,8 @@ export default class ReceiveTransactionRoute extends PaymailRoute {
   }
 
   private verifyTransactionSignature(message: string, signature: string, pubkey: string): void {
-    const sig = Signature.fromDER(signature, 'hex');
+    const sig = Signature.fromCompact(signature, 'base64');
+    const recovery = Utils.toArray(signature, 'base64')[0] - 27;
     if (!sig.verify(message, PublicKey.fromString(pubkey))) {
       throw new PaymailBadRequestError('Invalid Signature');
     }

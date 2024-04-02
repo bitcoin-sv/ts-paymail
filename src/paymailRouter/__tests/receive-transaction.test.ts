@@ -62,7 +62,7 @@ describe('#Paymail Server - P2P Receive Transaction', () => {
       reference: 'someRefId'
     })
     expect(response.statusCode).toBe(400)
-    expect(response.error.text).toEqual('Signature DER must start with 0x30')
+    expect(response.error.text).toEqual('Invalid Compact Signature')
   })
 
   it('should reject with invalid public key', async () => {
