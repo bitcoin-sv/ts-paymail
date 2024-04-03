@@ -12,7 +12,8 @@ describe('#Paymail Server - Get Public Profile', () => {
   
     const routes = [
       new PublicProfileRoute({
-        domainLogicHandler: (name, domain) => {
+        domainLogicHandler: (params) => {
+          const { name, domain } = PublicProfileRoute.getNameAndDomain(params);
           return {
             name: name,
             domain: domain,

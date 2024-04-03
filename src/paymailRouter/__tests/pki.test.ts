@@ -14,7 +14,8 @@ describe('#Paymail Server - PKI', () => {
   
     const routes = [
       new PublicKeyInfrastructureRoute({
-        domainLogicHandler: (name, domain) => {
+        domainLogicHandler: (params) => {
+          const { name, domain } = PublicKeyInfrastructureRoute.getNameAndDomain(params);
           return {
             handle: `${name}@${domain}`,
             pubkey: userIdentityKey.toPublicKey().toString()

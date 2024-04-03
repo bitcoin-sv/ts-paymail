@@ -14,7 +14,7 @@ describe('#Paymail Server - P2P Payment Destinations', () => {
     client = new PaymailClient(); // Assuming the client is needed for route config
     const routes = [
       new P2pPaymentDestinationRoute({
-        domainLogicHandler: (name, domain, body) => {
+        domainLogicHandler: (_, body) => {
           return {
             outputs: [
               {

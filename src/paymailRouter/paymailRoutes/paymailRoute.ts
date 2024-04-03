@@ -28,19 +28,15 @@ export default class PaymailRoute {
     return endpoint;
   }
 
-  private getParameters(req: Request): { name: string, domain: string, pubkey?: string } {
-    const [name, domain] = req.params.paymail.split('@');
-    const { pubkey } = req.params;
-    return { name, domain, pubkey };
-  }
-
   protected async defaultHandler(req: Request, res: Response, next: NextFunction): Promise<any> {
     try {
       await this.validateBody(req.body).catch((error) => {
         throw new PaymailBadRequestError(error.message);
       });
-      const { name, domain, pubkey } = this.getParameters(req);
-      const response = await this.domainLogicHandler(name, domain, req.body, pubkey);
+      if (!req.params.paymail) {
+        throw new PaymailBadRequestError('Paymail handle is required.');
+      }
+      const response = await this.domainLogicHandler(req.params, req.body);
       const serializedResponse = this.serializeResponse(response);
       return this.sendSuccessResponse(res, serializedResponse);
     } catch (error) {
@@ -74,5 +70,10 @@ export default class PaymailRoute {
 
   public getMethod(): 'GET' | 'POST' {
     return this.capability.getMethod();
+  }
+
+  static getNameAndDomain(params: any): { name: string, domain: string, pubkey?: string } {
+    const [name, domain] = params.paymail.split('@');
+    return { name, domain };
   }
 }
