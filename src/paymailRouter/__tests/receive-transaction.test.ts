@@ -3,7 +3,7 @@ import express from 'express'
 import PaymailRouter from '../../../dist/cjs/src/paymailRouter/paymailRouter.js'
 import ReceiveTransactionRoute from '../../../dist/cjs/src/paymailRouter/paymailRoutes/receiveTransaction.js'
 import PaymailClient from '../../../dist/cjs/src/paymailClient/paymailClient';
-import { PrivateKey, Transaction } from '@bsv/sdk';
+import { PrivateKey, Transaction, BigNumber, Utils, Signature, Hash } from '@bsv/sdk';
 
 describe('#Paymail Server - P2P Receive Transaction', () => {
   let app

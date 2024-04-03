@@ -1,9 +1,10 @@
 import Joi from 'joi';
-import { PublicKey, Transaction, Signature, Utils } from '@bsv/sdk';
+import { PublicKey, Transaction, Signature, Utils, Hash, BigNumber } from '@bsv/sdk';
 import PaymailRoute, { DomainLogicHandler } from './paymailRoute.js';
 import P2pReceiveTransactionCapability from '../../capability/p2pReceiveTransactionCapability.js';
 import { PaymailBadRequestError } from '../../errors/index.js';
 import PaymailClient from '../../paymailClient/paymailClient.js';
+const { sha256 } = Hash
 
 interface ReceiveTransactionResponse {
   txid: string;
@@ -75,26 +76,24 @@ export default class ReceiveTransactionRoute extends PaymailRoute {
     signature: string;
   }): Promise<void> {
     const { sender, pubkey, signature } = metadata;
-    const match = await this.verifySenderPublicKey(sender, pubkey);
-    if (!match) {
-      throw new PaymailBadRequestError('Invalid Public Key for sender');
-    }
+    await this.verifySenderPublicKey(sender, pubkey);
     this.verifyTransactionSignature(tx.id('hex') as string, signature, pubkey);
   }
 
-  private async verifySenderPublicKey(sender: string, pubkey: string): Promise<boolean> {
+  private async verifySenderPublicKey(sender: string, pubkey: string): Promise<void> {
     const { match } = await this.paymailClient.verifyPublicKey(sender, pubkey);
-    return match;
+    if (!match) {
+      throw new PaymailBadRequestError('Invalid Public Key for sender');
+    }
   }
 
-  private verifyTransactionSignature(message: string, signature: string, pubkey: string): void {
-    // FIX ME - Waiting for SDK update
-    
-    // const sig = Signature.fromCompact(signature, 'base64');
-    // const recovery = Utils.toArray(signature, 'base64')[0] - 27;
-    // if (!sig.verify(message, PublicKey.fromString(pubkey))) {
-    //   throw new PaymailBadRequestError('Invalid Signature');
-    // }
+  private verifyTransactionSignature(message: string, signature: string, pubkey: string): void {   
+    const sig = Signature.fromCompact(signature, 'base64');
+    const recovery = Utils.toArray(signature, 'base64')[0] - 27 - 4;
+    const msgHash = new BigNumber(sha256(message, 'hex'), 16)
+    const pkRecovered = sig.RecoverPublicKey(recovery, msgHash)
+    if(pkRecovered.toString() !== pubkey) throw new PaymailBadRequestError('PubKey does not match signature')
+    if (!sig.verify(message, PublicKey.fromString(pubkey), 'hex')) throw new PaymailBadRequestError('Invalid Signature')
   }
 
   protected serializeResponse(domainLogicResponse: ReceiveTransactionResponse): string {
