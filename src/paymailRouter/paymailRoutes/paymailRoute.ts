@@ -8,7 +8,7 @@ interface PaymailRouteConfig {
   domainLogicHandler: RequestHandler
 }
 
-export type DomainLogicHandler = (name: string, domain: string, body?: any, pubkey?: string) => Promise<any>
+export type DomainLogicHandler = (params: any, body?: any, pubkey?: string) => Promise<any>
 
 export default class PaymailRoute {
   private readonly capability: Capability
@@ -36,7 +36,8 @@ export default class PaymailRoute {
       if (!req.params.paymail) {
         throw new PaymailBadRequestError('Paymail handle is required.')
       }
-      const response = await this.domainLogicHandler(req.params, req.body)
+      const parsedBody = JSON.parse(req.body ?? {})
+      const response = await this.domainLogicHandler(req.params, parsedBody)
       const serializedResponse = this.serializeResponse(response)
       return this.sendSuccessResponse(res, serializedResponse)
     } catch (error) {
