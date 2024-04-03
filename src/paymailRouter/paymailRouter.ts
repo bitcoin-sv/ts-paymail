@@ -6,6 +6,7 @@ import { PaymailBadRequestError } from '../errors/index.js'
 
 interface PaymailRouterConfig {
   baseUrl: string
+  basePath?: string
   routes: PaymailRoute[]
   errorHandler?: ErrorRequestHandler
   requestSenderValidation?: boolean
@@ -18,6 +19,7 @@ interface PaymailRouterConfig {
 export default class PaymailRouter {
   private readonly router: Router
   public baseUrl: string
+  public basePath: string
   public routes: PaymailRoute[]
   public requestSenderValidation: boolean
 
@@ -27,6 +29,7 @@ export default class PaymailRouter {
    */
   constructor (config: PaymailRouterConfig) {
     this.baseUrl = config.baseUrl
+    this.basePath = config.basePath ?? ''
     this.router = express.Router()
     this.router.use(bodyParser.json({ type: 'application/json' }))
     this.routes = config.routes
@@ -34,10 +37,11 @@ export default class PaymailRouter {
 
     this.routes.forEach(route => {
       const method = route.getMethod()
+      const path = this.getBasePath() + route.getEndpoint();
       if (method === 'GET') {
-        this.router.get(route.getEndpoint(), route.getHandler())
+        this.router.get(path, route.getHandler())
       } else if (method === 'POST') {
-        this.router.post(route.getEndpoint(), route.getHandler())
+        this.router.post(path, route.getHandler())
       } else {
         throw new PaymailBadRequestError('Unsupported method: ' + method)
       }
@@ -86,6 +90,10 @@ export default class PaymailRouter {
 
   private joinUrl (...parts: string[]): string {
     return parts.map(part => part.replace(/(^\/+|\/+$)/g, '')).join('/')
+  }
+
+  private getBasePath (): string {
+    return this.basePath
   }
 
   /**

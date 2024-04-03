@@ -8,7 +8,7 @@ interface PaymailRouteConfig {
   domainLogicHandler: RequestHandler;
 }
 
-export type DomainLogicHandler = (name: string, domain: string, body?: any) => Promise<any>;
+export type DomainLogicHandler = (name: string, domain: string, body?: any, pubkey?: string) => Promise<any>;
 
 export default class PaymailRoute {
   private readonly capability: Capability;
@@ -28,9 +28,10 @@ export default class PaymailRoute {
     return endpoint;
   }
 
-  private getNameAndDomainFromRequest(req: Request): { name: string, domain: string } {
+  private getParameters(req: Request): { name: string, domain: string, pubkey?: string } {
     const [name, domain] = req.params.paymail.split('@');
-    return { name, domain };
+    const { pubkey } = req.params;
+    return { name, domain, pubkey };
   }
 
   protected async defaultHandler(req: Request, res: Response, next: NextFunction): Promise<any> {
@@ -38,8 +39,8 @@ export default class PaymailRoute {
       await this.validateBody(req.body).catch((error) => {
         throw new PaymailBadRequestError(error.message);
       });
-      const { name, domain } = this.getNameAndDomainFromRequest(req);
-      const response = await this.domainLogicHandler(name, domain, req.body);
+      const { name, domain, pubkey } = this.getParameters(req);
+      const response = await this.domainLogicHandler(name, domain, req.body, pubkey);
       const serializedResponse = this.serializeResponse(response);
       return this.sendSuccessResponse(res, serializedResponse);
     } catch (error) {
