@@ -12,7 +12,7 @@ describe('#Paymail Server - P2P Receive Transaction', () => {
   beforeAll(() => {
     app = express()
     const baseUrl = 'http://localhost:3000'
-    paymailClient = new PaymailClient()
+    paymailClient = new PaymailClient(null, { dns: null }, null)
 
     const routes = [
       new ReceiveTransactionRoute({
