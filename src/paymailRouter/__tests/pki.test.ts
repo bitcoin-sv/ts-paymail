@@ -9,25 +9,24 @@ describe('#Paymail Server - PKI', () => {
   const userIdentityKey = PrivateKey.fromRandom()
 
   beforeAll(() => {
-    app = express();
-    const baseUrl = 'http://localhost:3000';
-  
+    app = express()
+    const baseUrl = 'http://localhost:3000'
+
     const routes = [
       new PublicKeyInfrastructureRoute({
         domainLogicHandler: (params) => {
-          const { name, domain } = PublicKeyInfrastructureRoute.getNameAndDomain(params);
+          const { name, domain } = PublicKeyInfrastructureRoute.getNameAndDomain(params)
           return {
             handle: `${name}@${domain}`,
             pubkey: userIdentityKey.toPublicKey().toString()
-          };
+          }
         }
       })
-    ];
-  
-    const paymailRouter = new PaymailRouter({ baseUrl, routes });
-    app.use(paymailRouter.getRouter());
-  });
-  
+    ]
+
+    const paymailRouter = new PaymailRouter({ baseUrl, routes })
+    app.use(paymailRouter.getRouter())
+  })
 
   it('should get identity key for user', async () => {
     const response = await request(app).get('/id/satoshi@bsv.org').send()

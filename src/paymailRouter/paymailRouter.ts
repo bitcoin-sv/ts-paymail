@@ -37,7 +37,7 @@ export default class PaymailRouter {
 
     this.routes.forEach(route => {
       const method = route.getMethod()
-      const path = this.getBasePath() + route.getEndpoint();
+      const path = this.getBasePath() + route.getEndpoint()
       if (method === 'GET') {
         this.router.get(path, route.getHandler())
       } else if (method === 'POST') {
