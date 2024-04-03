@@ -3,7 +3,8 @@ import { fetchUser } from '../mockUser.js'
 import { Transaction } from '@bsv/sdk'
 
 const receiveTransactionRoute = new ReceiveTransactionRoute({
-  domainLogicHandler: async (name, domain, body) => {
+  domainLogicHandler: async (params, body) => {
+    const { name, domain } = ReceiveTransactionRoute.getNameAndDomain(params)
     const user = await fetchUser(name, domain)
     const tx = Transaction.fromHex(body.hex)
     await user.broadcastTransaction(tx)

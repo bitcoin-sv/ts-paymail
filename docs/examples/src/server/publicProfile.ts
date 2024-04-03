@@ -2,7 +2,8 @@ import { PublicProfileRoute } from '@bsv/paymail'
 import { fetchUser } from '../mockUser.js'
 
 const publicProfileRoute = new PublicProfileRoute({
-  domainLogicHandler: async (name, domain) => {
+  domainLogicHandler: async (params) => {
+    const { name, domain } = PublicProfileRoute.getNameAndDomain(params)
     const user = await fetchUser(name, domain)
     return {
       name: user.getAlias(),
