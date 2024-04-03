@@ -76,7 +76,7 @@ export default class PaymailRouter {
     this.router.get('/.well-known/bsvalias', (req, res) => {
       const capabilities = this.routes.reduce((map, route) => {
         const endpoint = route.getEndpoint().replace(/:paymail/g, '{alias}@{domain.tld}').replace(/:pubkey/g, '{pubkey}')
-        map[route.getCode()] = this.joinUrl(this.baseUrl, endpoint)
+        map[route.getCode()] = this.joinUrl(this.baseUrl, this.getBasePath(), endpoint)
         return map
       }, {})
       capabilities[RequestSenderValidationCapability.getCode()] = !!this.requestSenderValidation
