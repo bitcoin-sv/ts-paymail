@@ -41,7 +41,6 @@ export default class ReceiveTransactionRoute extends PaymailRoute {
   }
 
   private buildSchema() {
-    console.log(this.verifySignature)
     const metadataSchema = Joi.object({
       sender: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
       pubkey: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
