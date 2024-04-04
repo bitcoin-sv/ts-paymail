@@ -25,7 +25,6 @@ describe('#Paymail Server - Transaction Negotiation Capabilities', () => {
 
   it('should get transaction negotiation capabilities', async () => {
     const response = await request(app).get('/transaction-negotiation-capabilities/satoshi@vistamail.org');
-    console.log(response.error);
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
       send_disabled: false,
