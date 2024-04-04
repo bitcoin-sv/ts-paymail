@@ -26,6 +26,11 @@ export default class PaymailRoute {
     public getCode(): string 
     public getEndpoint(): string 
     public getMethod(): "GET" | "POST" 
+    static getNameAndDomain(params: any): {
+        name: string;
+        domain: string;
+        pubkey?: string;
+    } 
 }
 ```
 
@@ -40,6 +45,7 @@ It sets up the necessary routes and handlers based on the given configuration.
 ```ts
 export default class PaymailRouter {
     public baseUrl: string;
+    public basePath: string;
     public routes: PaymailRoute[];
     public requestSenderValidation: boolean;
     constructor(config: PaymailRouterConfig) 
@@ -86,7 +92,7 @@ Links: [API](#api), [Classes](#classes), [Types](#types)
 ## Type: DomainLogicHandler
 
 ```ts
-export type DomainLogicHandler = (name: string, domain: string, body?: any) => Promise<any>
+export type DomainLogicHandler = (name: string, domain: string, body?: any, pubkey?: string) => Promise<any>
 ```
 
 Links: [API](#api), [Classes](#classes), [Types](#types)

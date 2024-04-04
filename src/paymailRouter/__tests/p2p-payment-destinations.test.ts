@@ -9,9 +9,9 @@ describe('#Paymail Server - P2P Payment Destinations', () => {
   let client: PaymailClient
 
   beforeAll(() => {
-    app = express();
-    const baseUrl = 'http://localhost:3000';
-    client = new PaymailClient(); // Assuming the client is needed for route config
+    app = express()
+    const baseUrl = 'http://localhost:3000'
+    client = new PaymailClient(null, { dns: null }, null)
     const routes = [
       new P2pPaymentDestinationRoute({
         domainLogicHandler: (_, body) => {
@@ -23,13 +23,13 @@ describe('#Paymail Server - P2P Payment Destinations', () => {
               }
             ],
             reference: 'someref'
-          };
+          }
         }
       })
-    ];
-    const paymailRouter = new PaymailRouter({ baseUrl, routes });
-    app.use(paymailRouter.getRouter());
-  });
+    ]
+    const paymailRouter = new PaymailRouter({ baseUrl, routes })
+    app.use(paymailRouter.getRouter())
+  })
 
   it('should get public profile for user paymail', async () => {
     const response = await request(app).post('/p2p-payment-destination/satoshi@bsv.org').send({
