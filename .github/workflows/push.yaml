@@ -54,6 +54,8 @@ jobs:
       run: npm run test
     - name: Version
       run: npm version patch
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.BSV_NPM_TOKEN }}
     - name: Publish to NPM
       run: npm publish
       env:
