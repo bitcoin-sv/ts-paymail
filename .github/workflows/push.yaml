@@ -52,6 +52,8 @@ jobs:
       run: npm install
     - name: Test
       run: npm run test
+    - name: Version
+      run: npm version patch
     - name: Publish to NPM
       run: npm publish
       env:
