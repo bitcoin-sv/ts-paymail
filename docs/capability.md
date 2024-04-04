@@ -1,6 +1,42 @@
 
-Links: [API](#api), [Classes](#classes)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes)
 
+# Interfaces
+
+## Interface: TransactionNegotiationBody
+
+```ts
+export interface TransactionNegotiationBody {
+    thread_id: string;
+    fees: Array<{
+        feeType: string;
+        satoshis: number;
+        bytes: number;
+    }>;
+    expanded_tx: {
+        tx: string;
+        ancestors: Array<{
+            tx: string;
+            merkle_proofs?: any[];
+            miner_responses?: any[];
+        }>;
+        spent_outputs: Array<{
+            value: number;
+            locking_script: string;
+        }>;
+    };
+    expiry: number;
+    timestamp: number;
+    reply_to: {
+        handle: string;
+        peer_channel?: string;
+    };
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes)
+
+---
 # Classes
 
 ## Class: Capability
@@ -73,6 +109,6 @@ The HTTP method ('GET' or 'POST').
 
 </details>
 
-Links: [API](#api), [Classes](#classes)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes)
 
 ---
