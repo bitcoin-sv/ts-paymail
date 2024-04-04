@@ -13,7 +13,7 @@ describe('#Paymail Server - P2P Receive Beef Transaction', () => {
     app = express()
     const baseUrl = 'http://localhost'
     const basePath = '/paymail'
-    paymailClient = new PaymailClient()
+    paymailClient = new PaymailClient(null, { dns: null }, null)
 
     const routes = [
       new ReceiveBeefTransactionRoute({

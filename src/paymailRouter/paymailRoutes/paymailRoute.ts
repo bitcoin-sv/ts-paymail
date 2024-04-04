@@ -36,8 +36,7 @@ export default class PaymailRoute {
       if (!req.params.paymail) {
         throw new PaymailBadRequestError('Paymail handle is required.')
       }
-      const parsedBody = JSON.parse(req.body ?? {})
-      const response = await this.domainLogicHandler(req.params, parsedBody)
+      const response = await this.domainLogicHandler(req.params, req.body)
       const serializedResponse = this.serializeResponse(response)
       return this.sendSuccessResponse(res, serializedResponse)
     } catch (error) {

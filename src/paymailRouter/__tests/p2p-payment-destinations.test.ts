@@ -11,7 +11,7 @@ describe('#Paymail Server - P2P Payment Destinations', () => {
   beforeAll(() => {
     app = express()
     const baseUrl = 'http://localhost:3000'
-    client = new PaymailClient() // Assuming the client is needed for route config
+    client = new PaymailClient(null, { dns: null }, null)
     const routes = [
       new P2pPaymentDestinationRoute({
         domainLogicHandler: (_, body) => {
