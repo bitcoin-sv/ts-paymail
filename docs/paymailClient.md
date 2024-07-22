@@ -193,10 +193,11 @@ export default class PaymailClient {
         }
         return value;
     };
-    public createP2PSignature = (msg: string, privKey: PrivateKey): string => {
-        const msgHash = new BigNumber(sha256(msg, "hex"), 16);
-        const sig = ECDSA.sign(msgHash, privKey, true);
-        const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), msgHash);
+    public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
+        const msg = Utils.toArray(txid, "utf8");
+        const msgHash = BSM.magicHash(msg);
+        const sig = BSM.sign(msg, privKey);
+        const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), new BigNumber(msgHash));
         return sig.toCompact(recovery, true, "base64") as string;
     };
     public verifyPublicKey = async (paymail, pubkey) => {
@@ -287,10 +288,11 @@ Argument Details
 Creates a digital signature for a P2P transaction using a given private key.
 
 ```ts
-public createP2PSignature = (msg: string, privKey: PrivateKey): string => {
-    const msgHash = new BigNumber(sha256(msg, "hex"), 16);
-    const sig = ECDSA.sign(msgHash, privKey, true);
-    const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), msgHash);
+public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
+    const msg = Utils.toArray(txid, "utf8");
+    const msgHash = BSM.magicHash(msg);
+    const sig = BSM.sign(msg, privKey);
+    const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), new BigNumber(msgHash));
     return sig.toCompact(recovery, true, "base64") as string;
 }
 ```

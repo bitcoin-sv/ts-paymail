@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { PublicKey, Transaction, Signature, Utils, Hash, BigNumber } from '@bsv/sdk'
+import { PublicKey, Transaction, Signature, Utils, Hash, BigNumber, BSM } from '@bsv/sdk'
 import PaymailRoute, { DomainLogicHandler } from './paymailRoute.js'
 import P2pReceiveTransactionCapability from '../../capability/p2pReceiveTransactionCapability.js'
 import { PaymailBadRequestError } from '../../errors/index.js'
@@ -88,12 +88,13 @@ export default class ReceiveTransactionRoute extends PaymailRoute {
   }
 
   private verifyTransactionSignature (message: string, signature: string, pubkey: string): void {
+    const msg = Utils.toArray(message, 'utf8')
     const sig = Signature.fromCompact(signature, 'base64')
     const recovery = Utils.toArray(signature, 'base64')[0] - 27 - 4
-    const msgHash = new BigNumber(sha256(message, 'hex'), 16)
-    const pkRecovered = sig.RecoverPublicKey(recovery, msgHash)
+    const msgHash = BSM.magicHash(msg)
+    const pkRecovered = sig.RecoverPublicKey(recovery, new BigNumber(msgHash))
     if (pkRecovered.toString() !== pubkey) throw new PaymailBadRequestError('PubKey does not match signature')
-    if (!sig.verify(message, PublicKey.fromString(pubkey), 'hex')) throw new PaymailBadRequestError('Invalid Signature')
+    if (!BSM.verify(msg, sig, pkRecovered)) throw new PaymailBadRequestError('Invalid Signature')
   }
 
   protected serializeResponse (domainLogicResponse: ReceiveTransactionResponse): string {

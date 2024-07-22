@@ -9,30 +9,30 @@ describe('#Paymail Server - Simple Ordinal P2P Payment Destinations', () => {
   let client: PaymailClient
 
   beforeAll(() => {
-    app = express();
-    const baseUrl = 'http://localhost:3000';
-    client = new PaymailClient(undefined, undefined, undefined);
+    app = express()
+    const baseUrl = 'http://localhost:3000'
+    client = new PaymailClient(undefined, undefined, undefined)
     const routes = [
       new OrdinalP2pPaymentDestinationRoute({
         domainLogicHandler: (name, domain, body) => {
           return {
             outputs: [
               {
-                script: '76a914f32281faa74e2ac037493f7a3cd317e8f5e9673688ac',
+                script: '76a914f32281faa74e2ac037493f7a3cd317e8f5e9673688ac'
               }
             ],
             reference: 'someref'
-          };
+          }
         }
       })
-    ];
-    const paymailRouter = new PaymailRouter({ baseUrl, routes });
-    app.use(paymailRouter.getRouter());
-  });
+    ]
+    const paymailRouter = new PaymailRouter({ baseUrl, routes })
+    app.use(paymailRouter.getRouter())
+  })
 
   it('should get ordinal p2p destination', async () => {
     const response = await request(app).post('/ordinal-p2p-payment-destination/satoshi@bsv.org').send({
-      ordinals: 1,
+      ordinals: 1
     })
     expect(response.statusCode).toBe(200)
     expect(response.body.outputs[0].script).toEqual('76a914f32281faa74e2ac037493f7a3cd317e8f5e9673688ac')

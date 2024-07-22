@@ -4,7 +4,7 @@ import HttpClient from './httpClient.js'
 import Capability from '../capability/capability.js'
 import Joi from 'joi'
 import { PaymailServerResponseError } from '../errors/index.js'
-import { PrivateKey, ECDSA, BigNumber, Hash } from '@bsv/sdk'
+import { PrivateKey, BSM, BigNumber, Hash, Utils } from '@bsv/sdk'
 import PublicProfileCapability from '../capability/publicProfileCapability.js'
 import PublicKeyInfrastructureCapability from '../capability/pkiCapability.js'
 import P2pPaymentDestinationCapability from '../capability/p2pPaymentDestinationCapability.js'
@@ -291,10 +291,11 @@ export default class PaymailClient {
    * @param privKey - The private key used for signing the transaction.
    * @returns A hex string representing the digital signature.
    */
-  public createP2PSignature = (msg: string, privKey: PrivateKey): string => {
-    const msgHash = new BigNumber(sha256(msg, 'hex'), 16)
-    const sig = ECDSA.sign(msgHash, privKey, true)
-    const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), msgHash)
+  public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
+    const msg = Utils.toArray(txid, 'utf8')
+    const msgHash = BSM.magicHash(msg)
+    const sig = BSM.sign(msg, privKey)
+    const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), new BigNumber(msgHash))
     return sig.toCompact(recovery, true, 'base64') as string
   }
 

@@ -92,7 +92,7 @@ Links: [API](#api), [Classes](#classes), [Types](#types)
 ## Type: DomainLogicHandler
 
 ```ts
-export type DomainLogicHandler = (name: string, domain: string, body?: any, pubkey?: string) => Promise<any>
+export type DomainLogicHandler = (params: any, body?: any, pubkey?: string) => Promise<any>
 ```
 
 Links: [API](#api), [Classes](#classes), [Types](#types)
