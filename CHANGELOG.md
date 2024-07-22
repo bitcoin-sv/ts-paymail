@@ -5,7 +5,8 @@ All notable changes to this project will be documented in this file. The format 
 ## Table of Contents
 
 - [Unreleased](#unreleased)
-- [1.0.0 - YYYY-MM-DD](#100---yyyy-mm-dd)
+- [1.0.0](#030---2024-07-22)
+- [0.3.0](#020)
 
 ## [Unreleased]
 
@@ -29,7 +30,21 @@ All notable changes to this project will be documented in this file. The format 
 
 ---
 
-## [1.0.0] - YYYY-MM-DD
+## [1.0.0] - 2024-07-22
+
+### Added
+- (Include new features or significant user-visible enhancements here.)
+
+### Changed
+- Paymail signatures in both Client and Server modules - such that it conforms to existing paymail implementations. They use BS< over the txid not just the txid itself as the msg.
+ts-paymail previously used a compact signature over sha256(txid)
+go-paymail implementation uses a compact signature over sha256d(Bitcoin Signed Message:\n${txid})
+ts-paymail will now conform to go-paymail as this is in line with original documentation hosted by a third party at paymail's launch.
+Few people enforce these signatures so no one has noticed until now.
+
+---
+
+## [0.3.0] - YYYY-MM-DD
 
 ### Added
 - Initial release
