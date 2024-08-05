@@ -164,7 +164,7 @@ export default class PaymailClient {
         });
         const schema = Joi.object({
             txid: Joi.string().required(),
-            note: Joi.string().optional().allow("")
+            note: Joi.string().optional().allow("", null)
         }).options({ stripUnknown: true });
         const { error, value } = schema.validate(response);
         if (error) {
@@ -185,7 +185,7 @@ export default class PaymailClient {
         });
         const schema = Joi.object({
             txid: Joi.string().required(),
-            note: Joi.string().optional().allow("")
+            note: Joi.string().optional().allow("", null)
         }).options({ stripUnknown: true });
         const { error, value } = schema.validate(response);
         if (error) {
@@ -231,7 +231,7 @@ export default class PaymailClient {
         });
         const schema = Joi.object({
             txid: Joi.string().required(),
-            note: Joi.string().optional().allow("")
+            note: Joi.string().optional().allow("", null)
         }).options({ stripUnknown: true });
         const { error, value } = schema.validate(response);
         if (error) {
@@ -459,7 +459,7 @@ public sendBeefTransactionP2P = async (paymail: string, beef: string, reference:
     });
     const schema = Joi.object({
         txid: Joi.string().required(),
-        note: Joi.string().optional().allow("")
+        note: Joi.string().optional().allow("", null)
     }).options({ stripUnknown: true });
     const { error, value } = schema.validate(response);
     if (error) {
@@ -488,7 +488,7 @@ public sendOrdinalTransactionP2P = async (paymail: string, hex: string, referenc
     });
     const schema = Joi.object({
         txid: Joi.string().required(),
-        note: Joi.string().optional().allow("")
+        note: Joi.string().optional().allow("", null)
     }).options({ stripUnknown: true });
     const { error, value } = schema.validate(response);
     if (error) {
@@ -528,7 +528,7 @@ public sendTransactionP2P = async (paymail: string, hex: string, reference: stri
     });
     const schema = Joi.object({
         txid: Joi.string().required(),
-        note: Joi.string().optional().allow("")
+        note: Joi.string().optional().allow("", null)
     }).options({ stripUnknown: true });
     const { error, value } = schema.validate(response);
     if (error) {

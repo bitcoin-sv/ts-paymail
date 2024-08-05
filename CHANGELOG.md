@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. The format 
 ## Table of Contents
 
 - [Unreleased](#unreleased)
+- [1.0.1](#101---2024-08-05)
 - [1.0.0](#030---2024-07-22)
 - [0.3.0](#020)
 
@@ -27,6 +28,13 @@ All notable changes to this project will be documented in this file. The format 
 
 ### Security
 - (Notify of any improvements related to security vulnerabilities or potential risks.)
+
+---
+
+## [1.0.1] - 2024-08-05
+
+### Fixed
+- Allow 'note' parameter in paymail responses to be null as well as '' and undefined within Joi.
 
 ---
 
