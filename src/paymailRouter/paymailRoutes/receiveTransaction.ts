@@ -46,7 +46,7 @@ export default class ReceiveTransactionRoute extends PaymailRoute {
       sender: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
       pubkey: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
       signature: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
-      note: Joi.string().allow('').optional()
+      note: Joi.string().allow('', null).optional()
     }).options({ stripUnknown: true })
     return Joi.object({
       hex: Joi.string().required(),

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc -p tsconfig.json",
-    "lint" : "ts-standard --fix src/**/*.ts",
+    "lint": "ts-standard --fix src/**/*.ts",
     "server": "npm run build && node dist/cjs/src/server.js",
     "client": "npm run build && node dist/cjs/src/client.js",
     "getProfile": "npm run build && node dist/cjs/src/client/getProfile.js",
@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@bsv/paymail": "^1.0.1",
     "@bsv/sdk": "^1.0.11",
     "express": "^4.19.1",
     "jwt-simple": "^0.5.6",
