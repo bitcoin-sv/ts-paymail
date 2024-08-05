@@ -44,7 +44,7 @@ export default class ReceiveBeefTransactionRoute extends PaymailRoute {
       sender: Joi.string().required(),
       pubkey: Joi.string().required(),
       signature: Joi.string().required(),
-      note: Joi.string().allow('').optional()
+      note: Joi.string().allow('', null).optional()
     })
 
     return Joi.object({

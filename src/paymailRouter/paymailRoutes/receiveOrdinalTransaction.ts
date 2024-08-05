@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import { PublicKey, Transaction, Signature } from '@bsv/sdk'
 import PaymailRoute, { DomainLogicHandler } from './paymailRoute.js'
-import simpleP2pOrdinalReceiveCapability from 'src/capability/simpleP2pOrdinalReceiveCapability.js'
+import simpleP2pOrdinalReceiveCapability from '../../capability/simpleP2pOrdinalReceiveCapability.js'
 import { PaymailBadRequestError } from '../../errors/index.js'
 import PaymailClient from '../../paymailClient/paymailClient.js'
 
@@ -46,7 +46,7 @@ export default class SimpleP2pOrdinalReceiveRoute extends PaymailRoute {
       sender: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
       pubkey: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
       signature: this.verifySignature ? Joi.string().required() : Joi.string().allow('').optional(),
-      note: Joi.string().allow('').optional()
+      note: Joi.string().allow('', null).optional()
     }).options({ stripUnknown: true })
     return Joi.object({
       hex: Joi.string().required(),
