@@ -242,7 +242,7 @@ export default class PaymailClient {
 
     const schema = Joi.object({
       txid: Joi.string().required(),
-      note: Joi.string().optional().allow('')
+      note: Joi.string().optional().allow('', null)
     }).options({ stripUnknown: true })
     const { error, value } = schema.validate(response)
     if (error) {
@@ -276,7 +276,7 @@ export default class PaymailClient {
 
     const schema = Joi.object({
       txid: Joi.string().required(),
-      note: Joi.string().optional().allow('')
+      note: Joi.string().optional().allow('', null)
     }).options({ stripUnknown: true })
     const { error, value } = schema.validate(response)
     if (error) {
@@ -348,7 +348,7 @@ export default class PaymailClient {
     })
     const schema = Joi.object({
       txid: Joi.string().required(),
-      note: Joi.string().optional().allow('')
+      note: Joi.string().optional().allow('', null)
     }).options({ stripUnknown: true })
     const { error, value } = schema.validate(response)
     if (error) {
