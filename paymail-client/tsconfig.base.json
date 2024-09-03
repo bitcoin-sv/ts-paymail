@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "ESNext"],
+    "module": "NodeNext",
+    "target": "esnext",
+    "moduleResolution": "NodeNext",
+    "moduleDetection": "force",
+    "rootDir": "..",
+    "baseUrl": "..",
+    "strict": false,
+    "isolatedModules": true,
+    "strictNullChecks": false,
+    "downlevelIteration": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "outDir": "./dist"
+  },
+  "files": ["mod.ts"],
+  "include": ["src/capability", "src/paymailClient", "src/errors"],
+  "exclude": ["dist", "src/**/__tests__", "src/paymailRouter"]
+}
