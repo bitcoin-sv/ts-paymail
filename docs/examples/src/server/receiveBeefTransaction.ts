@@ -15,7 +15,8 @@ const WocHeadersClient = {
 }
 
 const receiveBeefTransactionRoute = new ReceiveBeefTransactionRoute({
-  domainLogicHandler: async (name, domain, body) => {
+  domainLogicHandler: async (params, body) => {
+    const { name, domain } = ReceiveBeefTransactionRoute.getNameAndDomain(params)
     const user = await fetchUser(name, domain)
     const tx = Transaction.fromHexBEEF(body.hex)
     tx.verify(WocHeadersClient)

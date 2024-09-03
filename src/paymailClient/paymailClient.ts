@@ -4,13 +4,17 @@ import HttpClient from './httpClient.js'
 import Capability from '../capability/capability.js'
 import Joi from 'joi'
 import { PaymailServerResponseError } from '../errors/index.js'
-import { PrivateKey, ECDSA, BigNumber, Hash } from '@bsv/sdk'
+import { PrivateKey, BSM, BigNumber, Hash, Utils } from '@bsv/sdk'
 import PublicProfileCapability from '../capability/publicProfileCapability.js'
 import PublicKeyInfrastructureCapability from '../capability/pkiCapability.js'
 import P2pPaymentDestinationCapability from '../capability/p2pPaymentDestinationCapability.js'
 import ReceiveTransactionCapability from '../capability/p2pReceiveTransactionCapability.js'
 import VerifyPublicKeyOwnerCapability from '../capability/verifyPublicKeyOwnerCapability.js'
 import ReceiveBeefTransactionCapability from '../capability/p2pReceiveBeefTransactionCapability.js'
+import NegotiationCapability from '../capability/negotiationCapabilities.js'
+import TransactionNegotiationCapabilities, { TransactionNegotiationBody } from '../capability/transactionNegotiationCapability.js'
+import SimpleP2pOrdinalDestinationsCapability from '../capability/simpleP2pOrdinalDestinationsCapability.js'
+import SimpleP2pOrdinalReceiveCapability from '../capability/simpleP2pOrdinalReceiveCapability.js'
 const { sha256 } = Hash
 
 /**
@@ -189,6 +193,31 @@ export default class PaymailClient {
   }
 
   /**
+   * Requests a P2P ordinal destination for a given Paymail.
+   * @param paymail - The Paymail address to request the payment destination for.
+   * @param ordinals - The amount of ordinals to be sent in transaction
+   * @returns An object containing the ordinal destination details.
+   */
+  public getP2pOrdinalDestinations = async (paymail: string, ordinals: number): Promise<any> => {
+    const response = await this.request(paymail, SimpleP2pOrdinalDestinationsCapability, {
+      ordinals
+    })
+
+    const schema = Joi.object({
+      outputs: Joi.array().items(
+        Joi.object({
+          script: Joi.string().required()
+        }).required().min(1)),
+      reference: Joi.string().required()
+    }).options({ stripUnknown: true })
+    const { error } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return response
+  }
+
+  /**
  * Sends a transaction using the Pay-to-Peer (P2P) protocol.
  * This method is used to send a transaction to a Paymail address.
  *
@@ -213,7 +242,41 @@ export default class PaymailClient {
 
     const schema = Joi.object({
       txid: Joi.string().required(),
-      note: Joi.string().optional().allow('')
+      note: Joi.string().optional().allow('', null)
+    }).options({ stripUnknown: true })
+    const { error, value } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return value
+  }
+
+  /**
+ * Sends a transaction using the Pay-to-Peer (P2P) protocol.
+ * This method is used to send a transaction to a Paymail address.
+ *
+ * @param paymail - The Paymail address to send the transaction to.
+ * @param hex - The transaction in hexadecimal format.
+ * @param reference - A reference identifier for the transaction.
+ * @param metadata - Optional metadata for the transaction including sender, public key, signature, and note.
+ * @returns A Promise that resolves to an object containing the transaction ID and an optional note.
+ * @throws PaymailServerResponseError - Thrown if there is a validation error in the response.
+ */
+  public sendOrdinalTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
+    sender: string
+    pubkey: string
+    signature: string
+    note: string
+  }) => {
+    const response = await this.request(paymail, SimpleP2pOrdinalReceiveCapability, {
+      hex,
+      reference,
+      metadata
+    })
+
+    const schema = Joi.object({
+      txid: Joi.string().required(),
+      note: Joi.string().optional().allow('', null)
     }).options({ stripUnknown: true })
     const { error, value } = schema.validate(response)
     if (error) {
@@ -228,14 +291,12 @@ export default class PaymailClient {
    * @param privKey - The private key used for signing the transaction.
    * @returns A hex string representing the digital signature.
    */
-  public createP2PSignature = (msg: string, privKey: PrivateKey): string => {
-    const msgHash = new BigNumber(sha256(msg, 'hex'), 16)
-    const sig = ECDSA.sign(msgHash, privKey, true)
-
-    return 'mock signature';
-    // FIXME - This is a temporary workaround until the SDK is fixed.
-    // const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), msgHash)
-    // return sig.toCompact(recovery, true, 'base64') as string
+  public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
+    const msg = Utils.toArray(txid, 'utf8')
+    const msgHash = BSM.magicHash(msg)
+    const sig = BSM.sign(msg, privKey)
+    const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), new BigNumber(msgHash))
+    return sig.toCompact(recovery, true, 'base64') as string
   }
 
   /**
@@ -287,12 +348,46 @@ export default class PaymailClient {
     })
     const schema = Joi.object({
       txid: Joi.string().required(),
-      note: Joi.string().optional().allow('')
+      note: Joi.string().optional().allow('', null)
     }).options({ stripUnknown: true })
     const { error, value } = schema.validate(response)
     if (error) {
       throw new PaymailServerResponseError(`Validation error: ${error.message}`)
     }
     return value
+  }
+
+  /**
+   * Retrieves the transaction negotiation capabilities for a given Paymail.
+   * @param paymail - The Paymail address to query for negotiation capabilities.
+   * @returns An object representing the negotiation capabilities.
+   * @throws PaymailServerResponseError - Thrown if there is a validation error in the response.
+   */
+  public getTransactionNegotiationCapabilities = async (paymail: string) => {
+    const response = await this.request(paymail, NegotiationCapability)
+    const schema = Joi.object({
+      send_disabled: Joi.boolean().default(false),
+      auto_send_response: Joi.boolean().default(false),
+      receive: Joi.boolean().default(false),
+      three_step_exchange: Joi.boolean().default(false),
+      four_step_exchange: Joi.boolean().default(false),
+      auto_exchange_response: Joi.boolean().default(false)
+    }).options({ stripUnknown: true })
+    const { error, value } = schema.validate(response)
+    if (error) {
+      throw new PaymailServerResponseError(`Validation error: ${error.message}`)
+    }
+    return value
+  }
+
+  /**
+   * Sends a transaction negotiation request to a Paymail address.
+   * @param paymail - The Paymail address to send the negotiation request to.
+   * @param body - The transaction negotiation request body.
+   * @returns The response from the Paymail service.
+   */
+  public sendTransactionNegotiation = async (paymail: string, body: TransactionNegotiationBody) => {
+    const response = await this.request(paymail, TransactionNegotiationCapabilities, body)
+    return response
   }
 }

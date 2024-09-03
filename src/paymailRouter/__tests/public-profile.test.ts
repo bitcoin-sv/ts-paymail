@@ -7,25 +7,25 @@ describe('#Paymail Server - Get Public Profile', () => {
   let app
 
   beforeAll(() => {
-    app = express();
-    const baseUrl = 'http://localhost:3000';
-  
+    app = express()
+    const baseUrl = 'http://localhost:3000'
+
     const routes = [
       new PublicProfileRoute({
-        domainLogicHandler: (name, domain) => {
+        domainLogicHandler: (params) => {
+          const { name, domain } = PublicProfileRoute.getNameAndDomain(params)
           return {
-            name: name,
-            domain: domain,
+            name,
+            domain,
             avatar: `https://avatar.com/${name}@${domain}`
-          };
+          }
         }
       })
-    ];
-  
-    const paymailRouter = new PaymailRouter({ baseUrl, routes });
-    app.use(paymailRouter.getRouter());
-  });
-  
+    ]
+
+    const paymailRouter = new PaymailRouter({ baseUrl, routes })
+    app.use(paymailRouter.getRouter())
+  })
 
   it('should get public profile for user paymail', async () => {
     const response = await request(app).get('/public-profile/satoshi@bsv.org')

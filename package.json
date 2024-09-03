@@ -1,6 +1,6 @@
 {
   "name": "@bsv/paymail",
-  "version": "1.0.0-beta",
+  "version": "2.0.0",
   "description": "BSV Paymail library",
   "publishConfig": {
     "access": "public"
@@ -70,9 +70,9 @@
     "test": "npm run build && jest --testTimeout=15000",
     "test:watch": "npm run build && jest --watch",
     "test:coverage": "npm run build && jest --coverage",
-    "lint": "ts-standard --fix src/**/*.ts",
-    "ex-lint": "ts-standard --fix examples/**/*.ts",
-    "docs-lint": "ts-standard --fix docs/**/*.ts",
+    "lint": "ts-standard --fix 'src/**/*.ts'",
+    "ex-lint": "ts-standard --fix 'docs/examples/**/*.ts'",
+    "docs-lint": "ts-standard --fix 'docs/**/*.ts'",
     "build": "tsc -b && tsconfig-to-dual-package tsconfig.cjs.json",
     "dev": "tsc -b -w",
     "prepublish": "npm run build",
@@ -105,7 +105,7 @@
     "@types/jest": "^29.5.5",
     "express": "^4.19.2",
     "jest": "^29.7.0",
-    "joi": "^17.12.2",
+    "joi": "^17.13.3",
     "node-fetch": "^2",
     "supertest": "^6.3.4",
     "ts-jest": "^29.1.1",

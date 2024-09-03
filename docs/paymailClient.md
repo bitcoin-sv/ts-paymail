@@ -95,7 +95,7 @@ export default class PaymailClient {
         const schema = Joi.object({
             name: Joi.string().required(),
             avatar: Joi.string().uri().required()
-        });
+        }).options({ stripUnknown: true });
         const { error, value } = schema.validate(response);
         if (error) {
             throw new PaymailServerResponseError(`Validation error: ${error.message}`);
@@ -108,7 +108,7 @@ export default class PaymailClient {
             bsvalias: Joi.string().optional().allow("1.0"),
             handle: Joi.string().required(),
             pubkey: Joi.string().required()
-        });
+        }).options({ stripUnknown: true });
         const { error, value } = schema.validate(response);
         if (error) {
             throw new PaymailServerResponseError(`Validation error: ${error.message}`);
@@ -125,13 +125,29 @@ export default class PaymailClient {
                 satoshis: Joi.number().required()
             }).required().min(1)),
             reference: Joi.string().required()
-        });
+        }).options({ stripUnknown: true });
         const { error } = schema.validate(response);
         if (error) {
             throw new PaymailServerResponseError(`Validation error: ${error.message}`);
         }
         if (satoshis !== response.outputs.reduce((acc, output) => acc + output.satoshis, 0)) {
             throw new PaymailServerResponseError("The server did not return the expected amount of satoshis");
+        }
+        return response;
+    };
+    public getP2pOrdinalDestinations = async (paymail: string, ordinals: number): Promise<any> => {
+        const response = await this.request(paymail, SimpleP2pOrdinalDestinationsCapability, {
+            ordinals
+        });
+        const schema = Joi.object({
+            outputs: Joi.array().items(Joi.object({
+                script: Joi.string().required()
+            }).required().min(1)),
+            reference: Joi.string().required()
+        }).options({ stripUnknown: true });
+        const { error } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
         }
         return response;
     };
@@ -148,8 +164,29 @@ export default class PaymailClient {
         });
         const schema = Joi.object({
             txid: Joi.string().required(),
-            note: Joi.string().optional().allow("")
+            note: Joi.string().optional().allow("", null)
+        }).options({ stripUnknown: true });
+        const { error, value } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        return value;
+    };
+    public sendOrdinalTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
+        sender: string;
+        pubkey: string;
+        signature: string;
+        note: string;
+    }) => {
+        const response = await this.request(paymail, SimpleP2pOrdinalReceiveCapability, {
+            hex,
+            reference,
+            metadata
         });
+        const schema = Joi.object({
+            txid: Joi.string().required(),
+            note: Joi.string().optional().allow("", null)
+        }).options({ stripUnknown: true });
         const { error, value } = schema.validate(response);
         if (error) {
             throw new PaymailServerResponseError(`Validation error: ${error.message}`);
@@ -157,7 +194,11 @@ export default class PaymailClient {
         return value;
     };
     public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
-        return privKey.sign(txid).toString("hex") as string;
+        const msg = Utils.toArray(txid, "utf8");
+        const msgHash = BSM.magicHash(msg);
+        const sig = BSM.sign(msg, privKey);
+        const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), new BigNumber(msgHash));
+        return sig.toCompact(recovery, true, "base64") as string;
     };
     public verifyPublicKey = async (paymail, pubkey) => {
         const [name, domain] = paymail.split("@");
@@ -170,7 +211,7 @@ export default class PaymailClient {
             handle: Joi.string().required(),
             pubkey: Joi.string().required(),
             match: Joi.boolean().required()
-        });
+        }).options({ stripUnknown: true });
         const { error } = schema.validate(responseBody);
         if (error) {
             throw new PaymailServerResponseError(`Validation error: ${error.message}`);
@@ -190,13 +231,33 @@ export default class PaymailClient {
         });
         const schema = Joi.object({
             txid: Joi.string().required(),
-            note: Joi.string().optional().allow("")
-        });
+            note: Joi.string().optional().allow("", null)
+        }).options({ stripUnknown: true });
         const { error, value } = schema.validate(response);
         if (error) {
             throw new PaymailServerResponseError(`Validation error: ${error.message}`);
         }
         return value;
+    };
+    public getTransactionNegotiationCapabilities = async (paymail: string) => {
+        const response = await this.request(paymail, NegotiationCapability);
+        const schema = Joi.object({
+            send_disabled: Joi.boolean().default(false),
+            auto_send_response: Joi.boolean().default(false),
+            receive: Joi.boolean().default(false),
+            three_step_exchange: Joi.boolean().default(false),
+            four_step_exchange: Joi.boolean().default(false),
+            auto_exchange_response: Joi.boolean().default(false)
+        }).options({ stripUnknown: true });
+        const { error, value } = schema.validate(response);
+        if (error) {
+            throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+        }
+        return value;
+    };
+    public sendTransactionNegotiation = async (paymail: string, body: TransactionNegotiationBody) => {
+        const response = await this.request(paymail, TransactionNegotiationCapabilities, body);
+        return response;
     };
 }
 ```
@@ -228,7 +289,11 @@ Creates a digital signature for a P2P transaction using a given private key.
 
 ```ts
 public createP2PSignature = (txid: string, privKey: PrivateKey): string => {
-    return privKey.sign(txid).toString("hex") as string;
+    const msg = Utils.toArray(txid, "utf8");
+    const msgHash = BSM.magicHash(msg);
+    const sig = BSM.sign(msg, privKey);
+    const recovery = sig.CalculateRecoveryFactor(privKey.toPublicKey(), new BigNumber(msgHash));
+    return sig.toCompact(recovery, true, "base64") as string;
 }
 ```
 
@@ -243,6 +308,29 @@ public ensureCapabilityFor = async (aDomain, aCapability) => {
         throw new PaymailServerResponseError(`Domain "${aDomain}" does not support capability "${aCapability}"`);
     }
     return capabilities[aCapability];
+}
+```
+
+### Property getP2pOrdinalDestinations
+
+Requests a P2P ordinal destination for a given Paymail.
+
+```ts
+public getP2pOrdinalDestinations = async (paymail: string, ordinals: number): Promise<any> => {
+    const response = await this.request(paymail, SimpleP2pOrdinalDestinationsCapability, {
+        ordinals
+    });
+    const schema = Joi.object({
+        outputs: Joi.array().items(Joi.object({
+            script: Joi.string().required()
+        }).required().min(1)),
+        reference: Joi.string().required()
+    }).options({ stripUnknown: true });
+    const { error } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return response;
 }
 ```
 
@@ -261,7 +349,7 @@ public getP2pPaymentDestination = async (paymail: string, satoshis: number): Pro
             satoshis: Joi.number().required()
         }).required().min(1)),
         reference: Joi.string().required()
-    });
+    }).options({ stripUnknown: true });
     const { error } = schema.validate(response);
     if (error) {
         throw new PaymailServerResponseError(`Validation error: ${error.message}`);
@@ -284,7 +372,7 @@ public getPki = async (paymail) => {
         bsvalias: Joi.string().optional().allow("1.0"),
         handle: Joi.string().required(),
         pubkey: Joi.string().required()
-    });
+    }).options({ stripUnknown: true });
     const { error, value } = schema.validate(response);
     if (error) {
         throw new PaymailServerResponseError(`Validation error: ${error.message}`);
@@ -303,7 +391,30 @@ public getPublicProfile = async (paymail) => {
     const schema = Joi.object({
         name: Joi.string().required(),
         avatar: Joi.string().uri().required()
-    });
+    }).options({ stripUnknown: true });
+    const { error, value } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return value;
+}
+```
+
+### Property getTransactionNegotiationCapabilities
+
+Retrieves the transaction negotiation capabilities for a given Paymail.
+
+```ts
+public getTransactionNegotiationCapabilities = async (paymail: string) => {
+    const response = await this.request(paymail, NegotiationCapability);
+    const schema = Joi.object({
+        send_disabled: Joi.boolean().default(false),
+        auto_send_response: Joi.boolean().default(false),
+        receive: Joi.boolean().default(false),
+        three_step_exchange: Joi.boolean().default(false),
+        four_step_exchange: Joi.boolean().default(false),
+        auto_exchange_response: Joi.boolean().default(false)
+    }).options({ stripUnknown: true });
     const { error, value } = schema.validate(response);
     if (error) {
         throw new PaymailServerResponseError(`Validation error: ${error.message}`);
@@ -348,13 +459,53 @@ public sendBeefTransactionP2P = async (paymail: string, beef: string, reference:
     });
     const schema = Joi.object({
         txid: Joi.string().required(),
-        note: Joi.string().optional().allow("")
-    });
+        note: Joi.string().optional().allow("", null)
+    }).options({ stripUnknown: true });
     const { error, value } = schema.validate(response);
     if (error) {
         throw new PaymailServerResponseError(`Validation error: ${error.message}`);
     }
     return value;
+}
+```
+
+### Property sendOrdinalTransactionP2P
+
+Sends a transaction using the Pay-to-Peer (P2P) protocol.
+This method is used to send a transaction to a Paymail address.
+
+```ts
+public sendOrdinalTransactionP2P = async (paymail: string, hex: string, reference: string, metadata?: {
+    sender: string;
+    pubkey: string;
+    signature: string;
+    note: string;
+}) => {
+    const response = await this.request(paymail, SimpleP2pOrdinalReceiveCapability, {
+        hex,
+        reference,
+        metadata
+    });
+    const schema = Joi.object({
+        txid: Joi.string().required(),
+        note: Joi.string().optional().allow("", null)
+    }).options({ stripUnknown: true });
+    const { error, value } = schema.validate(response);
+    if (error) {
+        throw new PaymailServerResponseError(`Validation error: ${error.message}`);
+    }
+    return value;
+}
+```
+
+### Property sendTransactionNegotiation
+
+Sends a transaction negotiation request to a Paymail address.
+
+```ts
+public sendTransactionNegotiation = async (paymail: string, body: TransactionNegotiationBody) => {
+    const response = await this.request(paymail, TransactionNegotiationCapabilities, body);
+    return response;
 }
 ```
 
@@ -377,8 +528,8 @@ public sendTransactionP2P = async (paymail: string, hex: string, reference: stri
     });
     const schema = Joi.object({
         txid: Joi.string().required(),
-        note: Joi.string().optional().allow("")
-    });
+        note: Joi.string().optional().allow("", null)
+    }).options({ stripUnknown: true });
     const { error, value } = schema.validate(response);
     if (error) {
         throw new PaymailServerResponseError(`Validation error: ${error.message}`);
@@ -403,7 +554,7 @@ public verifyPublicKey = async (paymail, pubkey) => {
         handle: Joi.string().required(),
         pubkey: Joi.string().required(),
         match: Joi.boolean().required()
-    });
+    }).options({ stripUnknown: true });
     const { error } = schema.validate(responseBody);
     if (error) {
         throw new PaymailServerResponseError(`Validation error: ${error.message}`);

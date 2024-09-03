@@ -1,34 +1,33 @@
 import PaymailRoute, { DomainLogicHandler } from './paymailRoute.js'
-import P2pPaymentDestinationCapability from '../../capability/p2pPaymentDestinationCapability.js'
+import simpleP2pOrdinalDestinationsCapability from '../../capability/simpleP2pOrdinalDestinationsCapability.js'
 import { PaymailBadRequestError } from '../../errors/index.js'
 import joi from 'joi'
 
-interface P2pDestination {
+interface OrdinalP2pDestination {
   script: string
-  satoshis: number
 }
 
-interface P2pDestinationsResponse {
-  outputs: P2pDestination[]
+interface OrdinalP2pDestinationsResponse {
+  outputs: OrdinalP2pDestination[]
   reference: string
 }
 
-interface P2pPaymentDestinationRouteConfig {
+interface OrdinalP2pPaymentDestinationRouteConfig {
   domainLogicHandler: DomainLogicHandler
 }
 
-export default class P2pPaymentDestinationRoute extends PaymailRoute {
-  constructor (config: P2pPaymentDestinationRouteConfig) {
+export default class OrdinalP2pPaymentDestinationRoute extends PaymailRoute {
+  constructor (config: OrdinalP2pPaymentDestinationRouteConfig) {
     super({
-      capability: P2pPaymentDestinationCapability,
-      endpoint: '/p2p-payment-destination/:paymail',
+      capability: simpleP2pOrdinalDestinationsCapability,
+      endpoint: '/ordinal-p2p-payment-destination/:paymail',
       domainLogicHandler: config.domainLogicHandler
     })
   }
 
   protected async validateBody (body: any): Promise<void> {
     const schema = joi.object({
-      satoshis: joi.number().required()
+      ordinals: joi.number().required()
     })
     const { error } = schema.validate(body)
     if (error) {
@@ -36,11 +35,10 @@ export default class P2pPaymentDestinationRoute extends PaymailRoute {
     }
   }
 
-  protected serializeResponse (domainLogicResponse: P2pDestinationsResponse): string {
+  protected serializeResponse (domainLogicResponse: OrdinalP2pDestinationsResponse): string {
     return JSON.stringify({
       outputs: domainLogicResponse.outputs.map(output => ({
-        script: output.script,
-        satoshis: output.satoshis
+        script: output.script
       })),
       reference: domainLogicResponse.reference
     })
