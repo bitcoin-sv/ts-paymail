@@ -1,6 +1,6 @@
 {
   "name": "@bsv/paymail",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "BSV Paymail library",
   "publishConfig": {
     "access": "public"
@@ -103,6 +103,7 @@
   "dependencies": {
     "@bsv/sdk": "^1.0.14",
     "@types/jest": "^29.5.5",
+    "cross-fetch": "^4.0.0",
     "express": "^4.19.2",
     "jest": "^29.7.0",
     "joi": "^17.13.3",

@@ -5,7 +5,7 @@ describe('#PaymailClient - P2P Payment Destination', () => {
   let paymailClient: PaymailClient
 
   beforeAll(() => {
-    paymailClient = new PaymailClient(new HttpClient(fetch), undefined, undefined)
+    paymailClient = new PaymailClient(new HttpClient(), undefined, undefined)
   })
 
   it('should get payment destinations with reference', async () => {

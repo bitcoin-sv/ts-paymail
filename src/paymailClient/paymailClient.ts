@@ -41,7 +41,7 @@ export default class PaymailClient {
    * @param localhostPort - The port number for localhost development. Defaults to 3000 if not specified.
    */
   constructor (httpClient?: HttpClient, dnsOptions?: DNSResolverOptions, localhostPort?: number) {
-    this.httpClient = httpClient || new HttpClient(fetch)
+    this.httpClient = httpClient || new HttpClient()
     this._domainCapabilityCache = new Map()
     this._resolver = new DNSResolver(dnsOptions, this.httpClient)
     this._localHostPort = localhostPort || 3000
@@ -57,13 +57,13 @@ export default class PaymailClient {
     const protocol = isLocalHost ? 'http://' : 'https://'
     let domain = aDomain
     let port = isLocalHost ? this._localHostPort : null
-
+  
     if (!isLocalHost) {
       ({ domain, port } = await this._resolver.queryBsvaliasDomain(aDomain))
     }
-
+  
     const url = `${protocol}${domain}:${port}/.well-known/bsvalias`
-    const response = await fetch(url)
+    const response = await this.httpClient.request(url)
     const json = await response.json()
     const schema = Joi.object({
       bsvalias: Joi.string().required(),
@@ -75,6 +75,7 @@ export default class PaymailClient {
     }
     return json.capabilities
   }
+  
 
   private isDomainLocalHost (aDomain) {
     return aDomain === 'localhost'
