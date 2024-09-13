@@ -5,7 +5,7 @@ describe('#PaymailClient - Public Profile', () => {
   let paymailClient: PaymailClient
 
   beforeAll(() => {
-    paymailClient = new PaymailClient(new HttpClient(fetch), undefined, undefined)
+    paymailClient = new PaymailClient(new HttpClient(), undefined, undefined)
   })
 
   it('should get Public profile for paymail', async () => {

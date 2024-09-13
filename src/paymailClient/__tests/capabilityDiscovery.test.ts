@@ -5,7 +5,7 @@ describe('#PaymailClient - Capability Discovery', () => {
   let paymailClient: PaymailClient
 
   beforeAll(() => {
-    paymailClient = new PaymailClient(new HttpClient(fetch), undefined, undefined)
+    paymailClient = new PaymailClient(new HttpClient(), undefined, undefined)
   })
 
   it('should get capabilities for paymail', async () => {

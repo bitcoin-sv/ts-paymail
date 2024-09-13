@@ -1,19 +1,18 @@
 import { PaymailServerResponseError } from '../errors/index.js'
-type Fetch = typeof fetch
+import fetch from 'cross-fetch'
+
 type FetchOptions = RequestInit & { timeout?: number }
 
 export default class HttpClient {
-  private readonly fetch: Fetch
   private readonly defaultTimeout: number
 
-  constructor (fetch: Fetch, defaultTimeout = 30000) {
-    this.fetch = fetch
+  constructor (defaultTimeout = 30000) {
     this.defaultTimeout = defaultTimeout
   }
 
   async request (
     url: string,
-    options: (FetchOptions & { method: 'GET' | 'POST', body?: any }) = {
+    options: FetchOptions & { method: 'GET' | 'POST', body?: any } = {
       method: 'GET'
     }
   ): Promise<Response> {
@@ -35,7 +34,7 @@ export default class HttpClient {
     }
 
     try {
-      const response = await this.fetch(url, requestOptions)
+      const response = await fetch(url, requestOptions)
       if (!response.ok) {
         throw new PaymailServerResponseError(await response.text())
       }
