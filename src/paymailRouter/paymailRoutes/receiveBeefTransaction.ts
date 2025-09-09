@@ -79,7 +79,7 @@ export default class ReceiveBeefTransactionRoute extends PaymailRoute {
     if (!match) {
       throw new PaymailBadRequestError('Invalid Public Key for sender')
     }
-    this.verifyTransactionSignature(tx.id('hex') as string, signature, pubkey)
+    this.verifyTransactionSignature(tx.id('hex'), signature, pubkey)
   }
 
   private async verifySenderPublicKey (sender: string, pubkey: string): Promise<boolean> {

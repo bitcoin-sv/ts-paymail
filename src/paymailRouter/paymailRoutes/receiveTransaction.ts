@@ -77,7 +77,7 @@ export default class ReceiveTransactionRoute extends PaymailRoute {
   }): Promise<void> {
     const { sender, pubkey, signature } = metadata
     await this.verifySenderPublicKey(sender, pubkey)
-    this.verifyTransactionSignature(tx.id('hex') as string, signature, pubkey)
+    this.verifyTransactionSignature(tx.id('hex'), signature, pubkey)
   }
 
   private async verifySenderPublicKey (sender: string, pubkey: string): Promise<void> {
