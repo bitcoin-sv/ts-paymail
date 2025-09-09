@@ -14,7 +14,7 @@ describe('#PaymailClient - Capability Discovery', () => {
   })
 
   it('should get capabilities for paymail', async () => {
-    const capabilities = await paymailClient.getDomainCapabilities('tkz.id')
+    const capabilities = await paymailClient.getDomainCapabilities('handcash.io')
     expect(capabilities).toHaveProperty('pki')
   })
 })

@@ -43,7 +43,7 @@ describe('#Paymail Server - P2P Receive Beef Transaction', () => {
       reference: 'someRefId'
     })
     expect(response.statusCode).toBe(400)
-    expect(response.error.text).toEqual('Invalid body: Invalid BEEF version. Expected 4022206465, received 1.')
+    expect(response.error.text).toEqual('Invalid body: Serialized BEEF must start with 4022206465 or 4022206466 but starts with 1')
   })
 
   it.skip('should receive beef transaction', async () => {
