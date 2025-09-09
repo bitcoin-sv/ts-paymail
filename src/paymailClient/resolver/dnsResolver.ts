@@ -38,8 +38,17 @@ class DNSResolver extends AbstractResolver {
     return aDomain.replace('_bsvalias._tcp.', '')
   }
 
-  domainsAreEqual (domain1, domain2) {
-    return domain1.replace(/\.$/, '') === domain2.replace(/\.$/, '')
+  domainsAreEqual (domain1: string, domain2: string): boolean {
+    const normDomain1 = domain1.replace(/\.$/, '')
+    const normDomain2 = domain2.replace(/\.$/, '')
+
+    // Domains are equal if they are identical after normalization,
+    // or if one is a subdomain of the other (e.g., 'sub.example.com' and 'example.com').
+    if (normDomain1 === normDomain2 || normDomain1.endsWith('.' + normDomain2) || normDomain2.endsWith('.' + normDomain1)) {
+      return true
+    }
+
+    return false
   }
 
   private async resolveWithDns (aDomain: string): Promise<any> {
