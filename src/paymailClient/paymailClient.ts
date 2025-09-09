@@ -57,11 +57,11 @@ export default class PaymailClient {
     const protocol = isLocalHost ? 'http://' : 'https://'
     let domain = aDomain
     let port = isLocalHost ? this._localHostPort : null
-  
+
     if (!isLocalHost) {
       ({ domain, port } = await this._resolver.queryBsvaliasDomain(aDomain))
     }
-  
+
     const url = `${protocol}${domain}:${port}/.well-known/bsvalias`
     const response = await this.httpClient.request(url)
     const json = await response.json()
@@ -75,7 +75,6 @@ export default class PaymailClient {
     }
     return json.capabilities
   }
-  
 
   private isDomainLocalHost (aDomain) {
     return aDomain === 'localhost'
